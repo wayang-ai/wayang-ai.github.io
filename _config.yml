@@ -12,7 +12,7 @@ baseurl: ""
 url: "https://wayang-ai.github.io"
 
 # Build settings
-remote_theme: pages-themes/merlot@v0.2.0
+remote_theme: pages-themes/architect@v0.2.0
 plugins:
   - jekyll-remote-theme
 
