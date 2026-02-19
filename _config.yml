@@ -1,0 +1,53 @@
+# Welcome to Jekyll!
+#
+# This config file is meant for settings that affect your whole blog, values
+# which you are expected to set up once and rarely edit after that.
+# For technical reasons, this file is *NOT* reloaded automatically when you use
+# 'bundle exec jekyll serve'. If you change this file, please restart the server process.
+
+# Site settings
+title: Wayang AI
+description: "AI Agent Workflow Platform - Build, deploy, and orchestrate intelligent AI agents with visual workflow designer"
+baseurl: ""
+url: "https://wayang-ai.github.io"
+
+# Build settings
+remote_theme: pages-themes/merlot@v0.2.0
+plugins:
+  - jekyll-remote-theme
+
+# Custom variables
+logo_text: "Wayang AI"
+show_downloads: true
+github:
+  repository_url: "https://github.com/wayang-ai/wayang-platform"
+  release_url: "https://github.com/wayang-ai/wayang-platform/releases"
+
+# Navigation
+nav:
+  - title: Home
+    url: /
+  - title: Features
+    url: /features/
+  - title: Documentation
+    url: /docs/
+  - title: About
+    url: /about/
+
+# Footer
+footer:
+  copyright: "© 2026 Wayang AI. All rights reserved."
+  links:
+    - title: GitHub
+      url: "https://github.com/wayang-ai"
+    - title: License
+      url: "https://github.com/wayang-ai/wayang-platform/blob/main/LICENSE"
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+  - .git
+  - .gitignore
