@@ -8,8 +8,8 @@
 # Site settings
 title: Wayang AI
 description: "AI Agent Workflow Platform - Build, deploy, and orchestrate intelligent AI agents with visual workflow designer"
-baseurl: "/"
-url: "https://wayang.github.io"
+baseurl: ""
+url: "https://wayang-ai.github.io"
 
 # Build settings
 remote_theme: pages-themes/merlot@v0.2.0
