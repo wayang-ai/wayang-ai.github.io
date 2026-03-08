@@ -120,3 +120,19 @@ curl -H "accept: application/json" \
 - `counters.delegationFailures` and `counters.delegationTimeouts` for stability issues
 - `latestBudget.maxAgentLatencyMs` and `latestBudget.maxRetriesPerDelegation` for guardrail tuning
 - grouped output (`groupBy=nodeId`) to identify the hottest/failing node
+
+## Debugger Snapshot Quickstart
+
+For one-shot troubleshooting payloads (status + events + telemetry + lineage), use:
+
+```bash
+curl -H "accept: application/json" \
+  "http://localhost:31713/api/v1/debug/projects/{projectId}/executions/{executionId}/snapshot?includeRaw=true&eventsLimit=200"
+```
+
+Related debug endpoints:
+
+- `/api/v1/debug/projects/{projectId}/executions/{executionId}/events`
+- `/api/v1/debug/projects/{projectId}/executions/{executionId}/telemetry`
+- `/api/v1/debug/projects/{projectId}/executions/{executionId}/lineage`
+- `/api/v1/debug/projects/{projectId}/executions/{executionId}/snapshot`

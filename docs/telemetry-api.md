@@ -68,3 +68,5 @@ Include raw events for debugging:
 curl -H "accept: application/json" \
   "http://localhost:31713/api/v1/projects/{projectId}/executions/{executionId}/telemetry?includeRaw=true"
 ```
+
+For combined debug payload (status + events + telemetry + lineage), see [Debugger API](./debugger-api).

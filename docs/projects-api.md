@@ -44,6 +44,13 @@ Execution endpoints:
 - `POST /api/v1/projects/{projectId}/executions/{executionId}/resume`
 - `DELETE /api/v1/projects/{projectId}/executions/{executionId}`
 
+Debugger endpoints (standalone):
+
+- `GET /api/v1/debug/projects/{projectId}/executions/{executionId}/events`
+- `GET /api/v1/debug/projects/{projectId}/executions/{executionId}/telemetry`
+- `GET /api/v1/debug/projects/{projectId}/executions/{executionId}/lineage`
+- `GET /api/v1/debug/projects/{projectId}/executions/{executionId}/snapshot`
+
 ## Create Project
 
 ```bash
@@ -359,4 +366,5 @@ Consent overlay (`requireConsent=true`):
 
 - [Schema Catalog and WayangSpec](./schema-catalog)
 - [Execution Telemetry API](./telemetry-api)
+- [Debugger API](./debugger-api)
 - [Standalone Troubleshooting](./standalone-troubleshooting)
