@@ -28,6 +28,7 @@ Build sophisticated agents powered by state-of-the-art AI models.
 - **Custom Agents** - Create specialized agents for your domain
 - **Memory & Context** - Persistent memory for long-running conversations
 - **Tool Integration** - Connect agents to APIs, databases, and external services
+- **Orchestrator-Controlled Loops** - Orchestrator coordinates planner -> executor -> evaluator iterations until done
 
 ### ⚡ Execution Engine
 
@@ -54,6 +55,7 @@ Extend Wayang AI to fit your needs.
 | Feature | Description |
 |---------|-------------|
 | **Workflow Orchestration** | Coordinate multiple agents with complex dependencies and conditions |
+| **Agent Role Separation** | Keep planning, execution, evaluation, and control-loop decisions in dedicated agents |
 | **Human-in-the-Loop** | Pause workflows for human review and approval |
 | **Scheduling** | Run workflows on cron schedules or triggered events |
 | **Monitoring** | Real-time dashboards and alerting for workflow execution |
