@@ -1,11 +1,11 @@
 ---
 layout: default
-title: Wayang Designer User Guide
+title: Wayang Kulit User Guide
 ---
 
-# Wayang Designer User Guide
+# Wayang Kulit User Guide
 
-This guide covers daily usage of the Wayang Designer desktop app, including local/cloud project handling, workflow execution, failure debugging, and logs.
+This guide covers daily usage of the Wayang Kulit desktop app, including local/cloud project handling, workflow execution, failure debugging, and logs.
 
 ---
 
@@ -25,7 +25,7 @@ Recent desktop improvements:
 
 See full changelog:
 
-- [Wayang Designer Release Notes](./designer-release-notes)
+- [Wayang Kulit Release Notes](./designer-release-notes)
 
 ---
 

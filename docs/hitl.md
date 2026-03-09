@@ -31,7 +31,7 @@ curl -X POST "http://localhost:31713/api/v1/projects/{projectId}/executions/{exe
 
 ## Designer Support
 
-In Wayang Designer, you can insert a checkpoint with:
+In Wayang Kulit, you can insert a checkpoint with:
 
 - right-click a node
 - choose `Insert HITL Checkpoint`

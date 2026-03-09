@@ -11,8 +11,12 @@ Get started with Wayang AI and learn how to build powerful AI agent workflows.
 
 ## Deep Dive Guides
 
-- [Wayang Designer User Guide](./designer-user-guide)
-- [Wayang Designer Release Notes](./designer-release-notes)
+- [Agent Skills](./agent-skills)
+- [ReAct Tool Execution](./react-mechanism)
+- [Gollek SDK Gateway & SPI](./sdk-gateway)
+- [Agent Audit Mechanism](./audit-mechanism)
+- [Wayang Kulit User Guide](./designer-user-guide)
+- [Wayang Kulit Release Notes](./designer-release-notes)
 - [Schema Catalog and WayangSpec](./schema-catalog)
 - [Projects API](./projects-api)
 - [Trigger Integrations](./triggers)
@@ -21,6 +25,7 @@ Get started with Wayang AI and learn how to build powerful AI agent workflows.
 - [MCP API Coverage](./mcp)
 - [Guardrails API & Execution](./guardrails)
 - [Execution Telemetry API](./telemetry-api)
+- [Execution Debugger API](./debugger-api)
 - [Standalone Troubleshooting](./standalone-troubleshooting)
 - [Testing Coverage](./testing-coverage)
 
@@ -96,39 +101,33 @@ wayang run workflow.yaml
 
 ## Core Concepts
 
-### Agents
+### Agents & Skills
 
-Agents are the building blocks of Wayang AI workflows. Each agent has a specific role and capabilities.
+Agents are the building blocks of Wayang AI workflows. In the latest architecture, agents are driven by **Skills** — data-driven personas defined in JSON.
 
-```yaml
-agents:
-  - id: researcher
-    type: llm
-    model: openai/gpt-4
-    prompt: "Research the topic and provide a summary."
-    tools:
-      - web_search
-      - file_read
-```
+- **Skills** define the persona, system prompts, and parameters.
+- **Unified Executor** handles the inference logic for all skills.
+- **Dynamic** - Create new agent personas without code changes.
+
+For a detailed look at the architecture, see the [Agent Skills Guide](./agent-skills).
 
 #### Orchestrator Loop Pattern
 
-In multi-agent execution, `orchestrator-agent` is the control-plane agent that manages delegation and iteration:
+In multi-agent execution, the **orchestrator-skill** managing the control-plane coordination:
 
-1. `planner-agent` creates or revises plan steps
-2. execution agents run plan steps (`coder-agent`, `common-agent`, `analytics-agent`, etc.)
-3. `evaluator-agent` assesses outputs and quality
-4. `orchestrator-agent` decides continue, retry, or re-plan
-5. loop repeats until exit criteria are met
+1. **planner-skill** creates or revises plan steps
+2. **execution skills** run plan steps (`coder`, `analytics`, etc.)
+3. **evaluator-skill** assesses outputs and quality
+4. **orchestrator-skill** decides continue, retry, or re-plan
 
-This means planner/executor/evaluator agents stay specialized, while orchestration state and loop decisions stay centralized in the orchestrator.
+This pattern keeps specialized logic in individual skills while loop state stays centralized in the orchestrator.
 
 ```mermaid
 sequenceDiagram
-  participant O as Orchestrator Agent
-  participant P as Planner Agent
-  participant X as Executor Agent (Coder/Basic/WebSearch)
-  participant E as Evaluator Agent
+  participant O as Orchestrator Skill
+  participant P as Planner Skill
+  participant X as Executor Skill (Coder/Basic)
+  participant E as Evaluator Skill
 
   O->>P: Create initial plan
   P-->>O: Plan v1
@@ -149,17 +148,17 @@ sequenceDiagram
   O-->>O: Finalize workflow result
 ```
 
-#### Agent Task Aliases in Orchestrator
+#### Built-in Skill Aliases
 
-When orchestrator delegates `agentTasks`, these aliases are supported:
+The following built-in skills are available:
 
-| Canonical | Aliases |
+| Canonical ID | Aliases |
 |---------|-------------|
-| planner | `planner-agent`, `agent-planner` |
-| coder | `coder-agent`, `agent-coder` |
-| analytic | `analytics-agent`, `agent-analytic` |
-| evaluator | `evaluator-agent`, `agent-evaluator` |
-| common/basic | `common-agent`, `agent-basic` |
+| `planner` | `planner-agent`, `agent-planner` |
+| `coder` | `coder-agent`, `agent-coder` |
+| `analytics` | `analytics-agent`, `agent-analytic` |
+| `evaluator` | `evaluator-agent`, `agent-evaluator` |
+| `common` | `common-agent`, `agent-basic` |
 
 #### Typed Inputs by Agent Type
 
@@ -785,11 +784,11 @@ Execution event timeline for standalone mode is persisted at:
 ~/.wayang/logs/server/cloud-project-execution-events.json
 ```
 
-### Execute From Wayang Designer UI
+### Execute From Wayang Kulit UI
 
 For full desktop usage flow (project lifecycle, execute/retry, failure focus, logs, and shortcuts), see:
 
-- [Wayang Designer User Guide](./designer-user-guide)
+- [Wayang Kulit User Guide](./designer-user-guide)
 
 Tip: to add a manual pause point quickly, right-click a node and choose `Insert HITL Checkpoint`.  
 This inserts a `hitl-human-task` checkpoint after that node and rewires outgoing edges through it.

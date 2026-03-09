@@ -1,9 +1,9 @@
 ---
 layout: default
-title: Wayang Designer Release Notes
+title: Wayang Kulit Release Notes
 ---
 
-# Wayang Designer Release Notes
+# Wayang Kulit Release Notes
 
 ## 2026-03-07
 
@@ -56,5 +56,5 @@ title: Wayang Designer Release Notes
 ### Docs
 
 - Added dedicated user guide:
-  - [Wayang Designer User Guide](./designer-user-guide)
+  - [Wayang Kulit User Guide](./designer-user-guide)
 

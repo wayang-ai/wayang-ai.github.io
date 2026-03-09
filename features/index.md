@@ -22,10 +22,11 @@ Design complex AI workflows with an intuitive drag-and-drop interface.
 
 ### 🤖 Intelligent Agent System
 
-Build sophisticated agents powered by state-of-the-art AI models.
+Build sophisticated agents powered by state-of-the-art AI models and a flexible architecture.
 
+- **Skill-Based Architecture** - Data-driven personas (JSON) replace hardcoded agent types
+- **Unified Executor** - One engine handles all agent skills with optimized inference
 - **Multi-LLM Support** - Works with OpenAI, Anthropic, Google, and open-source models
-- **Custom Agents** - Create specialized agents for your domain
 - **Memory & Context** - Persistent memory for long-running conversations
 - **Tool Integration** - Connect agents to APIs, databases, and external services
 - **Orchestrator-Controlled Loops** - Orchestrator coordinates planner -> executor -> evaluator iterations until done
