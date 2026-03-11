@@ -1,0 +1,5 @@
+tech.kayys.wayang.plugin
+tech.kayys.wayang.plugin.multi
+tech.kayys.wayang.plugin.spi.node
+tech.kayys.wayang.plugin.execution
+tech.kayys.wayang.plugin.executor

@@ -1,1 +1,1 @@
-tagSearchIndex = [];updateSearchResults();
+tagSearchIndex = [{"l":"Example","h":"interface tech.kayys.wayang.plugin.spi.node.NodeProvider","k":"16","u":"tech/kayys/wayang/plugin/spi/node/NodeProvider.html#example-heading"}];updateSearchResults();
