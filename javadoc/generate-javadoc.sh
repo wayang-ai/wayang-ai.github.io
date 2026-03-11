@@ -20,13 +20,13 @@ echo "Javadoc Output: $JAVADOC_OUTPUT"
 echo "Wayang Dir: $WAYANG_DIR"
 echo ""
 
-# Clean existing Javadoc
+# Clean existing Javadoc (but keep this script and README)
 echo "Cleaning existing Javadoc..."
-rm -rf "$JAVADOC_OUTPUT"/*
-mkdir -p "$JAVADOC_OUTPUT"
+find "$JAVADOC_OUTPUT" -mindepth 1 -maxdepth 1 ! -name '*.sh' ! -name 'README.md' ! -name '.gitignore' -exec rm -rf {} \;
 
 # Generate Javadoc
 echo "Generating Javadoc (this may take a few minutes)..."
+echo "Note: Skipping compilation, using source files directly..."
 cd "$WAYANG_DIR"
 mvn javadoc:aggregate-no-fork \
     -DskipTests \
