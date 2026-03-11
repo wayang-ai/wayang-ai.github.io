@@ -14,6 +14,10 @@ url: "https://wayang-ai.github.io"
 # Build settings
 plugins: []
 
+# Include javadoc directory
+include:
+  - javadoc
+
 # Custom variables
 logo_text: "Wayang AI"
 show_downloads: true

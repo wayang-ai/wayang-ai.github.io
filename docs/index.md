@@ -9,6 +9,15 @@ Get started with Wayang AI and learn how to build powerful AI agent workflows.
 
 ---
 
+## API Reference
+
+- **[Javadoc API Reference](./javadoc)** - Complete Java API documentation
+- **[Projects API](./projects-api)** - Project management and execution APIs
+- **[Schema Catalog](./schema-catalog)** - Schema registry and WayangSpec
+- **[SDK Gateway](./sdk-gateway)** - Gollek SDK Gateway & SPI
+
+---
+
 ## Deep Dive Guides
 
 - [Agent Skills](./agent-skills)
