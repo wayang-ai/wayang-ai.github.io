@@ -118,6 +118,7 @@ graph LR
     B -->|"discoverEnabledMcpServers()"| F["McpRegistryManager"]
     A -->|"resolveTools()"| G["ToolRegistry<br/>(wayang-tool-core)"]
     A -->|"memory context"| H["AgentMemoryService<br/>(wayang-memory-core)"]
+    H -->|"semantic search"| I["FaissVectorStore<br/>(JDK 25 FFM)"]
 ```
 ---
 

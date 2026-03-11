@@ -60,6 +60,36 @@ Expected RAG node output fields:
 
 If `tenantId` or `collection` is omitted, runtime defaults are used (`default-tenant` and `default`).
 
+## Embedding Providers
+
+Wayang AI defaults to **Gollek** for local embedding generation using GGUF models.
+
+Supported embedding providers:
+- **Gollek** (default): High-performance local embedding using GGUF. Default model: `Qwen/Qwen2.5-0.5B-Instruct`.
+- **OpenAI**: Hosted embeddings via OpenAI API.
+- **HuggingFace**: Remote embeddings via HuggingFace Inference API.
+
+Configure the embedding provider in your properties file:
+```properties
+wayang.embedding.provider=gollek
+wayang.embedding.model=Qwen/Qwen2.5-0.5B-Instruct
+```
+
+## Built-In Vector Stores
+
+Wayang AI natively supports **FAISS** out-of-the-box as its default vector search backend, utilizing the JDK 25 Foreign Function & Memory (FFM) API for maximum performance without external dependencies. 
+
+Other supported vector stores:
+- **FAISS** (default): High-performance C++ backend.
+- **In-Memory**: Standard Java-based exact vector search (dev/testing).
+- **PGVector**: PostgreSQL extension for production workloads.
+- **Pinecone**, **Chroma**, **Qdrant**, **Milvus**: Supported via standard configuration options.
+
+Configure the backend in your properties file:
+```properties
+wayang.vector.store.type=faiss
+```
+
 ## Admin Endpoint
 
 RAG plugin admin status endpoint:

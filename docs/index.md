@@ -106,6 +106,7 @@ wayang run workflow.yaml
 Agents are the building blocks of Wayang AI workflows. In the latest architecture, agents are driven by **Skills** — data-driven personas defined in JSON.
 
 - **Skills** define the persona, system prompts, and parameters.
+- **Native Vector Search (FAISS)** - JDK 25 powered high-performance memory and RAG backend.
 - **Unified Executor** handles the inference logic for all skills.
 - **Dynamic** - Create new agent personas without code changes.
 

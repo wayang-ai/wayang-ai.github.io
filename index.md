@@ -29,6 +29,10 @@ Design systems where multiple specialized agents work together, share context, a
 
 High-performance runtime with support for parallel execution, error handling, and seamless integration with external APIs and services.
 
+### 🧠 Native Vector Memory
+
+Built-in high-performance **FAISS** vector search engine powered by JDK 25 Foreign Function Memory (FFM). Provides zero-dependency semantic memory for RAG and autonomous agents out of the box with no external databases required!
+
 ### 🔌 Extensible Architecture
 
 Build custom agents, tools, and connectors. Our plugin system makes it easy to extend functionality and integrate with your existing stack.
