@@ -14,8 +14,8 @@ url: "https://wayang-ai.github.io"
 # Build settings
 plugins: []
 
-# Include javadoc directory
-include:
+# Keep javadoc directory (static HTML files)
+keep_files:
   - javadoc
 
 # Custom variables
