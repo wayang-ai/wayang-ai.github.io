@@ -19,6 +19,7 @@ Get started with Wayang AI and learn how to build powerful AI agent workflows.
 - [Wayang Kulit Release Notes](./designer-release-notes)
 - [Schema Catalog and WayangSpec](./schema-catalog)
 - [Projects API](./projects-api)
+- [Wayang Assistant](./wayang-assistant)
 - [Trigger Integrations](./triggers)
 - [HITL Execution Flow](./hitl)
 - [RAG API](./rag)

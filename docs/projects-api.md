@@ -367,4 +367,5 @@ Consent overlay (`requireConsent=true`):
 - [Schema Catalog and WayangSpec](./schema-catalog)
 - [Execution Telemetry API](./telemetry-api)
 - [Debugger API](./debugger-api)
+- [Wayang Assistant](./wayang-assistant)
 - [Standalone Troubleshooting](./standalone-troubleshooting)

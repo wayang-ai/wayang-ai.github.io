@@ -15,6 +15,10 @@ Wayang AI is building the future of intelligent automation. We believe that AI a
 
 "Wayang" comes from the traditional Indonesian puppet theater, where a master puppeteer (dalang) orchestrates multiple characters to tell compelling stories. Similarly, our platform enables you to orchestrate multiple AI agents to accomplish complex tasks.
 
+### Wayang Assistant
+
+Wayang includes an internal assistant that helps users build projects, answer questions about Wayang, and troubleshoot errors using official documentation. See [Wayang Assistant docs](/docs/wayang-assistant).
+
 ### The Vision
 
 We envision a world where:

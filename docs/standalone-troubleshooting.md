@@ -136,3 +136,19 @@ Related debug endpoints:
 - `/api/v1/debug/projects/{projectId}/executions/{executionId}/telemetry`
 - `/api/v1/debug/projects/{projectId}/executions/{executionId}/lineage`
 - `/api/v1/debug/projects/{projectId}/executions/{executionId}/snapshot`
+
+## Assistant Troubleshooting API
+
+If you want automated guidance for an error message, call the Wayang Assistant troubleshoot endpoint:
+
+```bash
+curl -X POST "http://localhost:31713/api/v1/assistant/troubleshoot" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "errorMessage": "Unsatisfied dependency for type ControlPlaneExecutorRegistry"
+  }'
+```
+
+Related:
+
+- [Wayang Assistant](./wayang-assistant)

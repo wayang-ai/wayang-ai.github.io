@@ -40,6 +40,14 @@ High-performance runtime for reliable workflow execution.
 - **State Management** - Track workflow state across executions
 - **Scalability** - From local development to production clusters
 
+### 🧭 Wayang Assistant
+
+An internal assistant that helps users build, understand, and troubleshoot Wayang.
+
+- **Ask & Learn** - Answers questions using official documentation
+- **Project Generator** - Builds Wayang projects from natural language intent
+- **Troubleshooting** - Error diagnosis with step-by-step guidance
+
 ### 🔌 Extensible Architecture
 
 Extend Wayang AI to fit your needs.
