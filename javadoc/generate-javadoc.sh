@@ -5,9 +5,10 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+# PROJECT_ROOT is 2 levels up from javadoc directory (website/wayang.github.io)
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 WAYANG_DIR="$PROJECT_ROOT/wayang"
-JAVADOC_OUTPUT="$PROJECT_ROOT/website/wayang.github.io/javadoc"
+JAVADOC_OUTPUT="$SCRIPT_DIR"
 
 echo "==================================="
 echo "Wayang AI Platform - Javadoc Generator"
@@ -45,6 +46,6 @@ echo "==================================="
 echo ""
 echo "To view the Javadoc:"
 echo "  1. Open in browser: open $JAVADOC_OUTPUT/index.html"
-echo "  2. Or run Jekyll: cd website/wayang.github.io && bundle exec jekyll serve"
+echo "  2. Or run Jekyll: cd ../ && bundle exec jekyll serve"
 echo "  3. Navigate to: http://localhost:4000/docs/javadoc/index.html"
 echo ""
