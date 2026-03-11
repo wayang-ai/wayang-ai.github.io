@@ -12,9 +12,7 @@ baseurl: ""
 url: "https://wayang-ai.github.io"
 
 # Build settings
-remote_theme: pages-themes/architect@v0.2.0
-plugins:
-  - jekyll-remote-theme
+plugins: []
 
 # Custom variables
 logo_text: "Wayang AI"
@@ -23,25 +21,7 @@ github:
   repository_url: "https://github.com/wayang-ai/wayang-platform"
   release_url: "https://github.com/wayang-ai/wayang-platform/releases"
 
-# Navigation
-nav:
-  - title: Home
-    url: /
-  - title: Features
-    url: /features/
-  - title: Documentation
-    url: /docs/
-  - title: About
-    url: /about/
-
-# Footer
-footer:
-  copyright: "© 2026 Wayang AI. All rights reserved."
-  links:
-    - title: GitHub
-      url: "https://github.com/wayang-ai"
-    - title: License
-      url: "https://github.com/wayang-ai/wayang-platform/blob/main/LICENSE"
+# Navigation and footer are defined in the custom layout.
 
 # Exclude from processing
 exclude:
