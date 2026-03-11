@@ -1,30 +1,10 @@
-# Javadoc generated files
-# These can be regenerated using: ./generate-javadoc.sh
-
-# Generated HTML/JS/CSS
-*.html
-*.js
-*.css
+# Javadoc generated files - DO NOT IGNORE
+# These files MUST be committed for GitHub Pages to serve them
+# 
+# Only ignore build artifacts that can be regenerated:
 *.sh
+javadoc.sh
 
-# Generated directories
-resource-files/
-script-files/
-legal/
-tech/
-
-# Generated files
-options
-packages
-element-list
-search.html
-module-search-index.js
-package-search-index.js
-type-search-index.js
-member-search-index.js
-tag-search-index.js
-
-# Keep documentation
-!.gitignore
-!README.md
+# Keep everything else (HTML, JS, CSS, resources)
+# These are required for the Javadoc to work on GitHub Pages
 
