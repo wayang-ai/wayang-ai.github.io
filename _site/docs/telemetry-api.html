@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Telemetry API | Wayang AI</title>
+  <meta name="description" content="Wayang AI documentation and platform guides for building agentic workflows.">
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('wayang-theme');
+        var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        var theme = stored || (prefersLight ? 'light' : 'dark');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <div class="site-bg" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand">Wayang AI</a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="/docs/">Docs</a>
+        <a href="/docs/javadoc">Javadoc</a>
+        <a href="/features/">Features</a>
+        <a href="/about/">About</a>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme">Theme</button>
+        <a href="https://github.com/wayang-ai/wayang-platform">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container content-shell">
+    <h1 id="telemetry-api">Telemetry API</h1>
+
+<p>Execution telemetry is available from:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/executions/{executionId}/telemetry"</span>
+</code></pre></div></div>
+
+<h2 id="query-parameters">Query Parameters</h2>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">from</code>: ISO-8601 timestamp lower bound (inclusive), example: <code class="language-plaintext highlighter-rouge">2026-03-07T00:00:00Z</code></li>
+  <li><code class="language-plaintext highlighter-rouge">to</code>: ISO-8601 timestamp upper bound (inclusive)</li>
+  <li><code class="language-plaintext highlighter-rouge">nodeId</code>: filter to a single node id</li>
+  <li><code class="language-plaintext highlighter-rouge">type</code>: filter by event type (for example <code class="language-plaintext highlighter-rouge">NODE_COMPLETED</code>)</li>
+  <li><code class="language-plaintext highlighter-rouge">groupBy</code>: <code class="language-plaintext highlighter-rouge">nodeId</code> or <code class="language-plaintext highlighter-rouge">type</code></li>
+  <li><code class="language-plaintext highlighter-rouge">sort</code>: grouped sort key with optional direction, example: <code class="language-plaintext highlighter-rouge">tasksExecuted:desc</code></li>
+  <li><code class="language-plaintext highlighter-rouge">limit</code>: max number of grouped rows returned</li>
+  <li><code class="language-plaintext highlighter-rouge">includeRaw</code>: <code class="language-plaintext highlighter-rouge">true</code> to include filtered <code class="language-plaintext highlighter-rouge">rawEvents</code> in response</li>
+</ul>
+
+<h2 id="response-shape">Response Shape</h2>
+
+<p>Top-level fields:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">projectId</code></li>
+  <li><code class="language-plaintext highlighter-rouge">executionId</code></li>
+  <li><code class="language-plaintext highlighter-rouge">eventCount</code></li>
+  <li><code class="language-plaintext highlighter-rouge">telemetryEventCount</code></li>
+  <li><code class="language-plaintext highlighter-rouge">orchestrationTypes</code></li>
+  <li><code class="language-plaintext highlighter-rouge">filters</code></li>
+  <li><code class="language-plaintext highlighter-rouge">counters</code></li>
+  <li><code class="language-plaintext highlighter-rouge">latestBudget</code> (if available)</li>
+  <li><code class="language-plaintext highlighter-rouge">grouped</code> (if <code class="language-plaintext highlighter-rouge">groupBy</code> is provided)</li>
+  <li><code class="language-plaintext highlighter-rouge">rawEventCount</code>, <code class="language-plaintext highlighter-rouge">rawEvents</code> (if <code class="language-plaintext highlighter-rouge">includeRaw=true</code>)</li>
+  <li><code class="language-plaintext highlighter-rouge">aggregatedAt</code></li>
+</ul>
+
+<h2 id="examples">Examples</h2>
+
+<p>Filter by time window:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/executions/{executionId}/telemetry?from=2026-03-07T00:00:00Z&amp;to=2026-03-07T01:00:00Z"</span>
+</code></pre></div></div>
+
+<p>Group by node:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/executions/{executionId}/telemetry?groupBy=nodeId"</span>
+</code></pre></div></div>
+
+<p>Group by type, sorted and limited:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/executions/{executionId}/telemetry?groupBy=type&amp;sort=tasksExecuted:desc&amp;limit=5"</span>
+</code></pre></div></div>
+
+<p>Include raw events for debugging:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/executions/{executionId}/telemetry?includeRaw=true"</span>
+</code></pre></div></div>
+
+<p>For combined debug payload (status + events + telemetry + lineage), see <a href="./debugger-api">Debugger API</a>.</p>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>Wayang AI Docs</span>
+      <a href="https://github.com/wayang-ai/wayang-platform">wayang-ai/wayang-platform</a>
+    </div>
+  </footer>
+</body>
+</html>

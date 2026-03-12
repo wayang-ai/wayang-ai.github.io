@@ -45,8 +45,9 @@ High-performance runtime for reliable workflow execution.
 An internal assistant that helps users build, understand, and troubleshoot Wayang.
 
 - **Ask & Learn** - Answers questions using official documentation
+- **Interactive Chat (RAG)** - Stateful conversations with context-aware document retrieval
 - **Project Generator** - Builds Wayang projects from natural language intent
-- **Troubleshooting** - Error diagnosis with step-by-step guidance
+- **Troubleshooting** - Automated error diagnosis with step-by-step guidance
 
 ### 🔌 Extensible Architecture
 

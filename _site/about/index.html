@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>About | Wayang AI</title>
+  <meta name="description" content="Wayang AI documentation and platform guides for building agentic workflows.">
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('wayang-theme');
+        var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        var theme = stored || (prefersLight ? 'light' : 'dark');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <div class="site-bg" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand">Wayang AI</a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="/docs/">Docs</a>
+        <a href="/docs/javadoc">Javadoc</a>
+        <a href="/features/">Features</a>
+        <a href="/about/">About</a>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme">Theme</button>
+        <a href="https://github.com/wayang-ai/wayang-platform">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container content-shell">
+    <h1 id="about-wayang-ai">About Wayang AI</h1>
+
+<h2 id="our-mission">Our Mission</h2>
+
+<p>Wayang AI is building the future of intelligent automation. We believe that AI agents should work together seamlessly, just like a well-orchestrated team, to solve complex problems and automate workflows.</p>
+
+<hr />
+
+<h2 id="what-is-wayang">What is Wayang?</h2>
+
+<p>“Wayang” comes from the traditional Indonesian puppet theater, where a master puppeteer (dalang) orchestrates multiple characters to tell compelling stories. Similarly, our platform enables you to orchestrate multiple AI agents to accomplish complex tasks.</p>
+
+<h3 id="wayang-assistant">Wayang Assistant</h3>
+
+<p>Wayang includes an internal assistant that helps users build projects, answer questions about Wayang, and troubleshoot errors using official documentation. See <a href="/docs/wayang-assistant">Wayang Assistant docs</a>.</p>
+
+<h3 id="the-vision">The Vision</h3>
+
+<p>We envision a world where:</p>
+<ul>
+  <li><strong>AI agents collaborate</strong> seamlessly to achieve complex goals</li>
+  <li><strong>Developers focus on creativity</strong> rather than infrastructure</li>
+  <li><strong>Automation is accessible</strong> to everyone, not just AI experts</li>
+  <li><strong>Intelligent workflows</strong> adapt and learn from experience</li>
+</ul>
+
+<hr />
+
+<h2 id="core-values">Core Values</h2>
+
+<h3 id="-open-source-first">🔓 Open Source First</h3>
+
+<p>Wayang AI is built on open-source principles. We believe in transparency, community collaboration, and giving back to the developer ecosystem.</p>
+
+<h3 id="-developer-experience">🎯 Developer Experience</h3>
+
+<p>Great tools should be intuitive. We prioritize clean APIs, comprehensive documentation, and delightful developer experiences.</p>
+
+<h3 id="-security--privacy">🔒 Security &amp; Privacy</h3>
+
+<p>Your data and workflows are sensitive. We build security into every layer of our platform and respect your privacy.</p>
+
+<h3 id="-global-community">🌍 Global Community</h3>
+
+<p>AI innovation happens everywhere. We’re building a global community of developers, researchers, and enthusiasts.</p>
+
+<hr />
+
+<h2 id="technology-stack">Technology Stack</h2>
+
+<p>Wayang AI is built with modern, battle-tested technologies:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Layer</th>
+      <th>Technology</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Runtime</strong></td>
+      <td>Node.js, TypeScript</td>
+    </tr>
+    <tr>
+      <td><strong>Workflow Engine</strong></td>
+      <td>Custom event-driven architecture</td>
+    </tr>
+    <tr>
+      <td><strong>AI Integration</strong></td>
+      <td>LangChain, LlamaIndex</td>
+    </tr>
+    <tr>
+      <td><strong>Storage</strong></td>
+      <td>PostgreSQL, Redis</td>
+    </tr>
+    <tr>
+      <td><strong>API</strong></td>
+      <td>REST, GraphQL</td>
+    </tr>
+    <tr>
+      <td><strong>UI</strong></td>
+      <td>React, TypeScript</td>
+    </tr>
+    <tr>
+      <td><strong>Deployment</strong></td>
+      <td>Docker, Kubernetes</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="the-team">The Team</h2>
+
+<p>Wayang AI is developed by a passionate team of engineers, researchers, and AI enthusiasts from around the world.</p>
+
+<h3 id="contributors">Contributors</h3>
+
+<p>Wayang AI wouldn’t exist without our amazing open-source contributors. Thank you to everyone who has helped make this project better.</p>
+
+<p><a href="https://github.com/wayang-ai/wayang-platform/graphs/contributors">View Contributors →</a></p>
+
+<hr />
+
+<h2 id="roadmap">Roadmap</h2>
+
+<h3 id="2026-q1">2026 Q1</h3>
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Core workflow engine</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Visual designer beta</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Multi-agent orchestration</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Plugin marketplace</li>
+</ul>
+
+<h3 id="2026-q2">2026 Q2</h3>
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Advanced monitoring &amp; observability</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Team collaboration features</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Enterprise SSO integration</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Performance optimizations</li>
+</ul>
+
+<h3 id="2026-q3-q4">2026 Q3-Q4</h3>
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Wayang Cloud hosting</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Advanced analytics</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />AI model fine-tuning</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Mobile applications</li>
+</ul>
+
+<hr />
+
+<h2 id="get-involved">Get Involved</h2>
+
+<p>We welcome contributions from the community!</p>
+
+<h3 id="-report-issues">🐛 Report Issues</h3>
+
+<p>Found a bug? Open an issue on GitHub.</p>
+
+<p><a href="https://github.com/wayang-ai/wayang-platform/issues">Report Issue →</a></p>
+
+<h3 id="-share-ideas">💡 Share Ideas</h3>
+
+<p>Have a feature request? Let’s discuss it.</p>
+
+<p><a href="https://github.com/wayang-ai/wayang-platform/discussions">Start Discussion →</a></p>
+
+<h3 id="-contribute-code">🔧 Contribute Code</h3>
+
+<p>Want to contribute? Check out our contributing guide.</p>
+
+<p><a href="https://github.com/wayang-ai/wayang-platform/blob/main/CONTRIBUTING.md">Contributing Guide →</a></p>
+
+<h3 id="-improve-docs">📝 Improve Docs</h3>
+
+<p>Help us improve documentation and tutorials.</p>
+
+<p><a href="https://github.com/wayang-ai/wayang-platform/tree/main/docs">Documentation →</a></p>
+
+<hr />
+
+<h2 id="acknowledgments">Acknowledgments</h2>
+
+<p>Wayang AI builds upon the incredible work of the open-source community:</p>
+
+<ul>
+  <li><a href="https://langchain.com">LangChain</a> - AI application framework</li>
+  <li><a href="https://llamaindex.ai">LlamaIndex</a> - Data framework for LLMs</li>
+  <li><a href="https://react.dev">React</a> - UI library</li>
+  <li><a href="https://nodejs.org">Node.js</a> - JavaScript runtime</li>
+  <li>And many more amazing projects</li>
+</ul>
+
+<hr />
+
+<h2 id="contact--social">Contact &amp; Social</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Platform</th>
+      <th>Link</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>GitHub</td>
+      <td><a href="https://github.com/wayang-ai">@wayang-ai</a></td>
+    </tr>
+    <tr>
+      <td>Twitter</td>
+      <td><a href="https://twitter.com/WayangAI">@WayangAI</a></td>
+    </tr>
+    <tr>
+      <td>Discord</td>
+      <td><a href="https://discord.gg/wayang-ai">Join Server</a></td>
+    </tr>
+    <tr>
+      <td>Email</td>
+      <td>hello@wayang.ai</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="license">License</h2>
+
+<p>Wayang AI is released under the <a href="https://github.com/wayang-ai/wayang-platform/blob/main/LICENSE">Apache 2.0 License</a>.</p>
+
+<hr />
+
+<p><a href="/">Back to Home</a>   <a href="/docs/">View Documentation</a></p>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>Wayang AI Docs</span>
+      <a href="https://github.com/wayang-ai/wayang-platform">wayang-ai/wayang-platform</a>
+    </div>
+  </footer>
+</body>
+</html>

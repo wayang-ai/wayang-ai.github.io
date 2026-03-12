@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MCP API Coverage | Wayang AI</title>
+  <meta name="description" content="Wayang AI documentation and platform guides for building agentic workflows.">
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('wayang-theme');
+        var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        var theme = stored || (prefersLight ? 'light' : 'dark');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <div class="site-bg" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand">Wayang AI</a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="/docs/">Docs</a>
+        <a href="/docs/javadoc">Javadoc</a>
+        <a href="/features/">Features</a>
+        <a href="/about/">About</a>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme">Theme</button>
+        <a href="https://github.com/wayang-ai/wayang-platform">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container content-shell">
+    <h1 id="mcp-api-test-coverage">MCP API Test Coverage</h1>
+
+<p>The MCP API has automated coverage at two levels in <code class="language-plaintext highlighter-rouge">wayang-tool-core</code>:</p>
+
+<ol>
+  <li>API/resource-level tests (direct resource invocation)</li>
+  <li>HTTP-level tests (<code class="language-plaintext highlighter-rouge">@QuarkusTest</code> + RestAssured)</li>
+</ol>
+
+<h2 id="covered-endpoints">Covered Endpoints</h2>
+
+<p>MCP Tools (<code class="language-plaintext highlighter-rouge">/api/v1/mcp/tools</code>):</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">GET /formats</code></li>
+  <li><code class="language-plaintext highlighter-rouge">POST /openapi</code></li>
+  <li><code class="language-plaintext highlighter-rouge">GET /</code></li>
+  <li><code class="language-plaintext highlighter-rouge">GET /{toolId}</code></li>
+  <li><code class="language-plaintext highlighter-rouge">POST /{toolId}/execute</code></li>
+  <li><code class="language-plaintext highlighter-rouge">PUT /{toolId}</code></li>
+  <li><code class="language-plaintext highlighter-rouge">DELETE /{toolId}</code></li>
+</ul>
+
+<p>MCP Registry (<code class="language-plaintext highlighter-rouge">/api/v1/mcp/registry</code>):</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">POST /import</code></li>
+  <li><code class="language-plaintext highlighter-rouge">GET /servers</code></li>
+  <li><code class="language-plaintext highlighter-rouge">POST /servers/{name}</code></li>
+  <li><code class="language-plaintext highlighter-rouge">DELETE /servers/{name}</code></li>
+</ul>
+
+<h2 id="test-classes">Test Classes</h2>
+
+<p>API/resource-level:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">tech.kayys.wayang.tool.api.ToolResourceTest</code></li>
+  <li><code class="language-plaintext highlighter-rouge">tech.kayys.wayang.tool.api.McpRegistryResourceTest</code></li>
+</ul>
+
+<p>HTTP-level:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">tech.kayys.wayang.tool.api.ToolResourceHttpTest</code></li>
+  <li><code class="language-plaintext highlighter-rouge">tech.kayys.wayang.tool.api.McpRegistryResourceHttpTest</code></li>
+</ul>
+
+<h2 id="run-mcp-tests">Run MCP Tests</h2>
+
+<p>Core API tests:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn <span class="nt">-f</span> wayang/executors/tool/wayang-tool-core/pom.xml <span class="se">\</span>
+  <span class="nt">-Dtest</span><span class="o">=</span>ToolResourceTest,McpRegistryResourceTest,ToolResourceHttpTest,McpRegistryResourceHttpTest <span class="se">\</span>
+  <span class="nt">-nsu</span> <span class="nb">test</span>
+</code></pre></div></div>
+
+<p>MCP module-specific tests:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn <span class="nt">-f</span> wayang/executors/tool/wayang-tool-mcp/pom.xml <span class="se">\</span>
+  <span class="nt">-Dtest</span><span class="o">=</span>MCPToolExecutorTest,McpResourceTest <span class="se">\</span>
+  <span class="nt">-nsu</span> <span class="nb">test</span>
+</code></pre></div></div>
+
+<p>Expected result:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">wayang-tool-core</code>: 26 tests, 0 failures/errors</li>
+  <li><code class="language-plaintext highlighter-rouge">wayang-tool-mcp</code>: 8 tests, 0 failures/errors</li>
+</ul>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>Wayang AI Docs</span>
+      <a href="https://github.com/wayang-ai/wayang-platform">wayang-ai/wayang-platform</a>
+    </div>
+  </footer>
+</body>
+</html>

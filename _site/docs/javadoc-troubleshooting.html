@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Javadoc Troubleshooting Guide | Wayang AI</title>
+  <meta name="description" content="Wayang AI documentation and platform guides for building agentic workflows.">
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('wayang-theme');
+        var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        var theme = stored || (prefersLight ? 'light' : 'dark');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <div class="site-bg" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand">Wayang AI</a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="/docs/">Docs</a>
+        <a href="/docs/javadoc">Javadoc</a>
+        <a href="/features/">Features</a>
+        <a href="/about/">About</a>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme">Theme</button>
+        <a href="https://github.com/wayang-ai/wayang-platform">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container content-shell">
+    <h1 id="javadoc-troubleshooting-guide">Javadoc Troubleshooting Guide</h1>
+
+<p>This guide helps you resolve common issues when generating or viewing the Wayang AI Platform Javadoc documentation.</p>
+
+<h2 id="quick-fixes">Quick Fixes</h2>
+
+<h3 id="most-common-issues">Most Common Issues</h3>
+
+<p><strong>Issue: Javadoc generation fails with compilation errors</strong></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Solution: Install dependencies first</span>
+<span class="nb">cd </span>wayang-platform
+mvn clean <span class="nb">install</span> <span class="nt">-DskipTests</span>
+
+<span class="c"># Then regenerate</span>
+<span class="nb">cd </span>wayang
+mvn javadoc:aggregate-no-fork <span class="nt">-DskipTests</span>
+</code></pre></div></div>
+
+<p><strong>Issue: OutOfMemoryError during generation</strong></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Solution: Increase memory</span>
+<span class="nb">export </span><span class="nv">MAVEN_OPTS</span><span class="o">=</span><span class="s2">"-Xmx4g -XX:MaxMetaspaceSize=1g"</span>
+mvn javadoc:aggregate-no-fork <span class="nt">-DskipTests</span>
+</code></pre></div></div>
+
+<p><strong>Issue: Javadoc pages return 404 in Jekyll</strong></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Solution: Clear cache and rebuild</span>
+<span class="nb">cd </span>website/wayang.github.io
+<span class="nb">rm</span> <span class="nt">-rf</span> .jekyll-cache _site
+bundle <span class="nb">exec </span>jekyll clean
+bundle <span class="nb">exec </span>jekyll serve
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="table-of-contents">Table of Contents</h2>
+
+<ol>
+  <li><a href="#build-errors">Build Errors</a></li>
+  <li><a href="#memory-issues">Memory Issues</a></li>
+  <li><a href="#generation-issues">Generation Issues</a></li>
+  <li><a href="#jekyll-integration">Jekyll Integration</a></li>
+  <li><a href="#performance-issues">Performance Issues</a></li>
+  <li><a href="#platform-specific-issues">Platform-Specific Issues</a></li>
+  <li><a href="#cicd-integration">CI/CD Integration</a></li>
+  <li><a href="#diagnostic-commands">Diagnostic Commands</a></li>
+</ol>
+
+<hr />
+
+<h2 id="build-errors">Build Errors</h2>
+
+<h3 id="compilation-errors">Compilation Errors</h3>
+
+<p><strong>Symptoms:</strong></p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">cannot find symbol</code> errors</li>
+  <li><code class="language-plaintext highlighter-rouge">package does not exist</code> errors</li>
+  <li>Build fails with exit code 1</li>
+</ul>
+
+<p><strong>Root Causes:</strong></p>
+<ol>
+  <li>Dependencies not installed in local Maven repository</li>
+  <li>Module dependencies not built</li>
+  <li>Incorrect module order in reactor build</li>
+</ol>
+
+<p><strong>Solutions:</strong></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Step 1: Clean install all dependencies</span>
+<span class="nb">cd </span>wayang-platform
+mvn clean <span class="nb">install</span> <span class="nt">-DskipTests</span>
+
+<span class="c"># Step 2: Verify installation</span>
+mvn dependency:resolve <span class="nt">-f</span> wayang/pom.xml
+
+<span class="c"># Step 3: Generate Javadoc</span>
+<span class="nb">cd </span>wayang
+mvn javadoc:aggregate-no-fork <span class="nt">-DskipTests</span>
+</code></pre></div></div>
+
+<p><strong>Prevention:</strong> Always run <code class="language-plaintext highlighter-rouge">mvn clean install -DskipTests</code> before generating Javadoc.</p>
+
+<h3 id="module-build-failures">Module Build Failures</h3>
+
+<p><strong>Symptoms:</strong></p>
+<ul>
+  <li>Specific module fails during Javadoc generation</li>
+  <li>Error message mentions a particular module name</li>
+</ul>
+
+<p><strong>Solution:</strong> Skip problematic modules temporarily</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Skip a specific module</span>
+mvn javadoc:aggregate-no-fork <span class="nt">-DskipTests</span> <span class="nt">-pl</span> <span class="s1">'!wayang-problematic-module'</span>
+
+<span class="c"># Or build only specific modules</span>
+mvn javadoc:aggregate-no-fork <span class="nt">-DskipTests</span> <span class="nt">-pl</span> wayang-core,wayang-api
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="memory-issues">Memory Issues</h2>
+
+<h3 id="outofmemoryerror-java-heap-space">OutOfMemoryError: Java Heap Space</h3>
+
+<p><strong>Symptoms:</strong></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>java.lang.OutOfMemoryError: Java heap space
+    at java.base/java.util.Arrays.copyOf(Arrays.java:3512)
+</code></pre></div></div>
+
+<p><strong>Solution:</strong> Increase Maven heap size</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Minimum (2GB)</span>
+<span class="nb">export </span><span class="nv">MAVEN_OPTS</span><span class="o">=</span><span class="s2">"-Xmx2g"</span>
+
+<span class="c"># Recommended (4GB)</span>
+<span class="nb">export </span><span class="nv">MAVEN_OPTS</span><span class="o">=</span><span class="s2">"-Xmx4g -XX:MaxMetaspaceSize=1g"</span>
+
+<span class="c"># For very large projects (8GB)</span>
+<span class="nb">export </span><span class="nv">MAVEN_OPTS</span><span class="o">=</span><span class="s2">"-Xmx8g -XX:MaxMetaspaceSize=2g"</span>
+
+<span class="c"># Then run</span>
+mvn javadoc:aggregate-no-fork <span class="nt">-DskipTests</span>
+</code></pre></div></div>
+
+<p><strong>Permanent Solution:</strong> Add to <code class="language-plaintext highlighter-rouge">~/.mavenrc</code> or <code class="language-plaintext highlighter-rouge">MAVEN_OPTS</code> environment variable</p>
+
+<h3 id="metaspace-errors">Metaspace Errors</h3>
+
+<p><strong>Symptoms:</strong></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>java.lang.OutOfMemoryError: Metaspace
+</code></pre></div></div>
+
+<p><strong>Solution:</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">MAVEN_OPTS</span><span class="o">=</span><span class="s2">"-XX:MaxMetaspaceSize=2g"</span>
+mvn javadoc:aggregate-no-fork <span class="nt">-DskipTests</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="generation-issues">Generation Issues</h2>
+
+<h3 id="empty-javadoc-output">Empty Javadoc Output</h3>
+
+<p><strong>Symptoms:</strong> Javadoc directory exists but contains no HTML files</p>
+
+<p><strong>Diagnostic Steps:</strong></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 1. Check plugin configuration</span>
+<span class="nb">cd </span>wayang
+mvn <span class="nb">help</span>:effective-pom | <span class="nb">grep</span> <span class="nt">-A</span> 20 maven-javadoc-plugin
+
+<span class="c"># 2. Verify output directory</span>
+<span class="nb">grep</span> <span class="s2">"reportOutputDirectory"</span> pom.xml
+
+<span class="c"># 3. Check for generation errors</span>
+<span class="nb">ls</span> <span class="nt">-la</span> target/site/
+</code></pre></div></div>
+
+<p><strong>Solutions:</strong></p>
+
+<ol>
+  <li><strong>Manual copy from module directories:</strong>
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>find wayang <span class="nt">-name</span> <span class="s2">"index.html"</span> <span class="nt">-path</span> <span class="s2">"*/javadoc/*"</span>
+<span class="nb">cp</span> <span class="nt">-r</span> wayang/website/wayang.github.io/javadoc/<span class="k">*</span> website/wayang.github.io/javadoc/
+</code></pre></div>    </div>
+  </li>
+  <li><strong>Regenerate with verbose output:</strong>
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn javadoc:aggregate-no-fork <span class="nt">-X</span> 2&gt;&amp;1 | <span class="nb">tee </span>javadoc-debug.log
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h3 id="missing-classes-in-javadoc">Missing Classes in Javadoc</h3>
+
+<p><strong>Symptoms:</strong> Some classes or packages don’t appear in generated Javadoc</p>
+
+<p><strong>Checklist:</strong></p>
+
+<ol>
+  <li><strong>Verify JavaDoc comments exist:</strong>
+```java
+/**
+    <ul>
+      <li>This class provides…
+ */
+public class MyClass { }
+```</li>
+    </ul>
+  </li>
+  <li><strong>Check package-info.java:</strong>
+```java
+/**
+    <ul>
+      <li>Package description.
+ */
+package tech.kayys.wayang.mypackage;
+```</li>
+    </ul>
+  </li>
+  <li><strong>Verify module inclusion:</strong>
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn <span class="nb">help</span>:evaluate <span class="nt">-Dexpression</span><span class="o">=</span>project.modules <span class="nt">-q</span> <span class="nt">-DforceStdout</span>
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h3 id="encoding-errors">Encoding Errors</h3>
+
+<p><strong>Symptoms:</strong></p>
+<ul>
+  <li>Warning messages about encoding</li>
+  <li>Special characters display incorrectly</li>
+</ul>
+
+<p><strong>Solution:</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">MAVEN_OPTS</span><span class="o">=</span><span class="s2">"-Dfile.encoding=UTF-8"</span>
+mvn javadoc:aggregate-no-fork <span class="nt">-DskipTests</span> <span class="nt">-Dencoding</span><span class="o">=</span>UTF-8 <span class="nt">-Ddocencoding</span><span class="o">=</span>UTF-8
+</code></pre></div></div>
+
+<p><strong>Verify locale:</strong></p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>locale  <span class="c"># Should show UTF-8</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="jekyll-integration">Jekyll Integration</h2>
+
+<h3 id="javadoc-returns-404">Javadoc Returns 404</h3>
+
+<p><strong>Symptoms:</strong> Navigating to <code class="language-plaintext highlighter-rouge">/docs/javadoc/index.html</code> shows 404 error</p>
+
+<p><strong>Solutions:</strong></p>
+
+<ol>
+  <li><strong>Check _config.yml:</strong>
+```yaml
+include:
+    <ul>
+      <li>javadoc
+```</li>
+    </ul>
+  </li>
+  <li><strong>Clear Jekyll cache:</strong>
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd </span>website/wayang.github.io
+<span class="nb">rm</span> <span class="nt">-rf</span> .jekyll-cache _site
+bundle <span class="nb">exec </span>jekyll clean
+bundle <span class="nb">exec </span>jekyll serve
+</code></pre></div>    </div>
+  </li>
+  <li><strong>Check file permissions:</strong>
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">chmod</span> <span class="nt">-R</span> 755 website/wayang.github.io/javadoc
+</code></pre></div>    </div>
+  </li>
+  <li><strong>Verify .jekyll-ignore:</strong>
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> .jekyll-ignore  <span class="c"># Should NOT contain 'javadoc'</span>
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h3 id="cssjs-not-loading">CSS/JS Not Loading</h3>
+
+<p><strong>Symptoms:</strong> Javadoc pages load but have no styling or search doesn’t work</p>
+
+<p><strong>Solutions:</strong></p>
+
+<ol>
+  <li><strong>Check resource files exist:</strong>
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">ls</span> <span class="nt">-la</span> website/wayang.github.io/javadoc/resource-files/
+<span class="nb">ls</span> <span class="nt">-la</span> website/wayang.github.io/javadoc/script-files/
+</code></pre></div>    </div>
+  </li>
+  <li><strong>Regenerate if missing:</strong>
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./generate-javadoc.sh
+</code></pre></div>    </div>
+  </li>
+  <li><strong>Check browser console:</strong> Look for 404 errors on CSS/JS files</li>
+</ol>
+
+<hr />
+
+<h2 id="performance-issues">Performance Issues</h2>
+
+<h3 id="slow-javadoc-generation">Slow Javadoc Generation</h3>
+
+<p><strong>Symptoms:</strong> Generation takes &gt;10 minutes</p>
+
+<p><strong>Solutions:</strong></p>
+
+<ol>
+  <li><strong>Use parallel builds:</strong>
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn javadoc:aggregate-no-fork <span class="nt">-T</span> 1C <span class="nt">-DskipTests</span>
+</code></pre></div>    </div>
+  </li>
+  <li><strong>Generate only for changed modules:</strong>
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn javadoc:javadoc <span class="nt">-pl</span> wayang-core <span class="nt">-DskipTests</span>
+</code></pre></div>    </div>
+  </li>
+  <li><strong>Use incremental builds:</strong>
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn javadoc:aggregate-no-fork <span class="nt">-DskipTests</span> <span class="nt">-Dmaven</span>.javadoc.useIncremental<span class="o">=</span><span class="nb">true</span>
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<h3 id="large-javadoc-size">Large Javadoc Size</h3>
+
+<p><strong>Symptoms:</strong> Generated Javadoc &gt;500MB</p>
+
+<p><strong>Solutions:</strong></p>
+
+<ol>
+  <li>
+    <p><strong>Exclude test sources</strong> (already configured)</p>
+  </li>
+  <li><strong>Reduce detail level in pom.xml:</strong>
+    <div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;additionalJOptions&gt;</span>
+  <span class="nt">&lt;additionalJOption&gt;</span>-Xdoclint:none<span class="nt">&lt;/additionalJOption&gt;</span>
+  <span class="nt">&lt;additionalJOption&gt;</span>-quiet<span class="nt">&lt;/additionalJOption&gt;</span>
+<span class="nt">&lt;/additionalJOptions&gt;</span>
+</code></pre></div>    </div>
+  </li>
+  <li><strong>Split by module:</strong>
+Generate separate Javadoc per module instead of aggregated</li>
+</ol>
+
+<hr />
+
+<h2 id="platform-specific-issues">Platform-Specific Issues</h2>
+
+<h3 id="macos">macOS</h3>
+
+<p><strong>Issue: Too many open files</strong></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Check current limit</span>
+<span class="nb">ulimit</span> <span class="nt">-n</span>
+
+<span class="c"># Increase limit</span>
+<span class="nb">ulimit</span> <span class="nt">-n</span> 4096
+
+<span class="c"># Then run</span>
+mvn javadoc:aggregate-no-fork
+</code></pre></div></div>
+
+<p><strong>Issue: Command line too long</strong></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Use response file</span>
+mvn javadoc:aggregate-no-fork <span class="nt">-Dmaven</span>.javadoc.useResponseFile<span class="o">=</span><span class="nb">true</span>
+</code></pre></div></div>
+
+<h3 id="linux">Linux</h3>
+
+<p><strong>Issue: Missing fonts</strong></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Debian/Ubuntu</span>
+<span class="nb">sudo </span>apt-get <span class="nb">install </span>fonts-dejavu-core
+
+<span class="c"># RHEL/CentOS</span>
+<span class="nb">sudo </span>yum <span class="nb">install </span>dejavu-sans-fonts
+
+<span class="c"># Then regenerate</span>
+mvn javadoc:aggregate-no-fork
+</code></pre></div></div>
+
+<h3 id="windows">Windows</h3>
+
+<p><strong>Issue: Path length limitations</strong></p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Enable long paths (Windows 10+)</span><span class="w">
+</span><span class="n">Set-ItemProperty</span><span class="w"> </span><span class="nt">-Path</span><span class="w"> </span><span class="s1">'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem'</span><span class="w"> </span><span class="nt">-Name</span><span class="w"> </span><span class="s1">'LongPathsEnabled'</span><span class="w"> </span><span class="nt">-Value</span><span class="w"> </span><span class="nx">1</span><span class="w">
+
+</span><span class="c"># Restart terminal and retry</span><span class="w">
+</span></code></pre></div></div>
+
+<p><strong>Issue: PowerShell execution policy</strong></p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Set-ExecutionPolicy</span><span class="w"> </span><span class="nt">-ExecutionPolicy</span><span class="w"> </span><span class="nx">RemoteSigned</span><span class="w"> </span><span class="nt">-Scope</span><span class="w"> </span><span class="nx">CurrentUser</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<h2 id="cicd-integration">CI/CD Integration</h2>
+
+<h3 id="github-actions">GitHub Actions</h3>
+
+<p><strong>Issue: Javadoc generation fails in CI</strong></p>
+
+<p><strong>Solution:</strong> Use this workflow template:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">name</span><span class="pi">:</span> <span class="s">Generate Javadoc</span>
+
+<span class="na">on</span><span class="pi">:</span>
+  <span class="na">push</span><span class="pi">:</span>
+    <span class="na">branches</span><span class="pi">:</span> <span class="pi">[</span> <span class="nv">main</span> <span class="pi">]</span>
+
+<span class="na">jobs</span><span class="pi">:</span>
+  <span class="na">javadoc</span><span class="pi">:</span>
+    <span class="na">runs-on</span><span class="pi">:</span> <span class="s">ubuntu-latest</span>
+    <span class="na">steps</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">uses</span><span class="pi">:</span> <span class="s">actions/checkout@v4</span>
+      
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Set up JDK </span><span class="m">25</span>
+        <span class="na">uses</span><span class="pi">:</span> <span class="s">actions/setup-java@v4</span>
+        <span class="na">with</span><span class="pi">:</span>
+          <span class="na">java-version</span><span class="pi">:</span> <span class="s1">'</span><span class="s">25'</span>
+          <span class="na">distribution</span><span class="pi">:</span> <span class="s1">'</span><span class="s">temurin'</span>
+          <span class="na">cache</span><span class="pi">:</span> <span class="s">maven</span>
+      
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Install dependencies</span>
+        <span class="na">run</span><span class="pi">:</span> <span class="s">mvn clean install -DskipTests -f wayang/pom.xml</span>
+      
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Generate Javadoc</span>
+        <span class="na">run</span><span class="pi">:</span> <span class="pi">|</span>
+          <span class="s">cd wayang</span>
+          <span class="s">mvn javadoc:aggregate-no-fork -DskipTests -Dmaven.test.skip=true</span>
+          <span class="s">cp -r website/wayang.github.io/javadoc/* ../website/wayang.github.io/javadoc/</span>
+      
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Deploy to GitHub Pages</span>
+        <span class="na">uses</span><span class="pi">:</span> <span class="s">peaceiris/actions-gh-pages@v3</span>
+        <span class="na">with</span><span class="pi">:</span>
+          <span class="na">github_token</span><span class="pi">:</span> <span class="s">$</span>
+          <span class="na">publish_dir</span><span class="pi">:</span> <span class="s">./website/wayang.github.io</span>
+</code></pre></div></div>
+
+<h3 id="gitlab-ci">GitLab CI</h3>
+
+<p><strong>Issue: Artifacts too large</strong></p>
+
+<p><strong>Solution:</strong> Compress Javadoc</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">javadoc</span><span class="pi">:</span>
+  <span class="na">stage</span><span class="pi">:</span> <span class="s">docs</span>
+  <span class="na">image</span><span class="pi">:</span> <span class="s">maven:3.9-eclipse-temurin-25</span>
+  <span class="na">script</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">cd wayang</span>
+    <span class="pi">-</span> <span class="s">mvn javadoc:aggregate-no-fork -DskipTests</span>
+    <span class="pi">-</span> <span class="s">cp -r website/wayang.github.io/javadoc/* ../website/wayang.github.io/javadoc/</span>
+    <span class="pi">-</span> <span class="s">tar -czf javadoc.tar.gz -C website/wayang.github.io javadoc</span>
+  <span class="na">artifacts</span><span class="pi">:</span>
+    <span class="na">paths</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">javadoc.tar.gz</span>
+    <span class="na">expire_in</span><span class="pi">:</span> <span class="s">1 week</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="diagnostic-commands">Diagnostic Commands</h2>
+
+<p>Useful commands for troubleshooting:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Check versions</span>
+mvn <span class="nt">-version</span>
+java <span class="nt">-version</span>
+
+<span class="c"># View effective POM configuration</span>
+mvn <span class="nb">help</span>:effective-pom <span class="nt">-f</span> wayang/pom.xml
+
+<span class="c"># List Javadoc goals</span>
+mvn javadoc:help
+
+<span class="c"># Debug generation (verbose)</span>
+mvn javadoc:aggregate-no-fork <span class="nt">-X</span> 2&gt;&amp;1 | <span class="nb">tee </span>javadoc-debug.log
+
+<span class="c"># Check generated files</span>
+find website/wayang.github.io/javadoc <span class="nt">-type</span> f | <span class="nb">wc</span> <span class="nt">-l</span>
+
+<span class="c"># Check size</span>
+<span class="nb">du</span> <span class="nt">-sh</span> website/wayang.github.io/javadoc/
+
+<span class="c"># Validate HTML</span>
+tidy <span class="nt">-e</span> website/wayang.github.io/javadoc/index.html
+
+<span class="c"># Check for broken links</span>
+find website/wayang.github.io/javadoc <span class="nt">-name</span> <span class="s2">"*.html"</span> <span class="nt">-exec</span> <span class="nb">grep</span> <span class="nt">-l</span> <span class="s2">"href=</span><span class="se">\"</span><span class="s2">#</span><span class="se">\"</span><span class="s2">"</span> <span class="o">{}</span> <span class="se">\;</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="getting-help">Getting Help</h2>
+
+<p>If issues persist after trying these solutions:</p>
+
+<h3 id="1-check-logs">1. Check Logs</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Recent Maven logs</span>
+<span class="nb">tail</span> <span class="nt">-100</span> /tmp/javadoc-generation.log
+
+<span class="c"># Debug log</span>
+<span class="nb">cat </span>javadoc-debug.log | <span class="nb">grep</span> <span class="nt">-i</span> error
+</code></pre></div></div>
+
+<h3 id="2-enable-debug-mode">2. Enable Debug Mode</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn javadoc:aggregate-no-fork <span class="nt">-X</span> <span class="o">&gt;</span> debug.log 2&gt;&amp;1
+<span class="c"># Search for "ERROR" or "FAILURE" in debug.log</span>
+</code></pre></div></div>
+
+<h3 id="3-known-issues">3. Known Issues</h3>
+
+<ul>
+  <li><a href="https://issues.apache.org/jira/projects/MJAVADOC">Maven Javadoc Plugin JIRA</a></li>
+  <li><a href="https://bugs.openjdk.org/">OpenJDK Javadoc Bugs</a></li>
+</ul>
+
+<h3 id="4-community-support">4. Community Support</h3>
+
+<ul>
+  <li><strong>Stack Overflow:</strong> Tag with <code class="language-plaintext highlighter-rouge">maven</code> and <code class="language-plaintext highlighter-rouge">javadoc</code></li>
+  <li><strong>Maven Users List:</strong> users@maven.apache.org</li>
+  <li><strong>Wayang GitHub Issues:</strong> Create an issue with debug logs</li>
+</ul>
+
+<hr />
+
+<h2 id="related-documentation">Related Documentation</h2>
+
+<ul>
+  <li><a href="./javadoc/README">Javadoc README</a></li>
+  <li><a href="./projects-api">Projects API Guide</a></li>
+  <li><a href="./schema-catalog">Schema Catalog</a></li>
+  <li><a href="./agent-skills">Agent Skills</a></li>
+</ul>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>Wayang AI Docs</span>
+      <a href="https://github.com/wayang-ai/wayang-platform">wayang-ai/wayang-platform</a>
+    </div>
+  </footer>
+</body>
+</html>

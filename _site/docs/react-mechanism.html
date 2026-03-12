@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ReAct Tool Execution Mechanism | Wayang AI</title>
+  <meta name="description" content="Wayang AI documentation and platform guides for building agentic workflows.">
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('wayang-theme');
+        var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        var theme = stored || (prefersLight ? 'light' : 'dark');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <div class="site-bg" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand">Wayang AI</a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="/docs/">Docs</a>
+        <a href="/docs/javadoc">Javadoc</a>
+        <a href="/features/">Features</a>
+        <a href="/about/">About</a>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme">Theme</button>
+        <a href="https://github.com/wayang-ai/wayang-platform">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container content-shell">
+    <h1 id="react-tool-execution-mechanism">ReAct Tool Execution Mechanism</h1>
+
+<p>Wayang AI has been upgraded to natively support <strong>Reason and Act (ReAct)</strong> style iterative tool execution. This allows agents to autonomously use tools and chain inferences together without any hardcoded logic.</p>
+
+<hr />
+
+<h2 id="-the-iterative-loop-lifecycle">🔁 The Iterative Loop Lifecycle</h2>
+
+<p>Tools in Wayang AI are exposed via the unified <code class="language-plaintext highlighter-rouge">ToolRegistry</code> and executed through the <code class="language-plaintext highlighter-rouge">SkillBasedAgentExecutor</code> and <code class="language-plaintext highlighter-rouge">GollekInferenceService</code>. At its core, an agent using tools goes through an autonomous reasoning loop:</p>
+
+<ol>
+  <li><strong>Inference Request</strong>: The Agent executes an initial inference containing a system prompt, context, multi-turn conversation history, and the user’s objective.</li>
+  <li><strong>LLM Tool Call</strong>: If the agent decides it needs to take an action (e.g., fetch data, write a file, search the web), the inference model halts and returns a <code class="language-plaintext highlighter-rouge">TOOL_CALLS</code> finish reason representing the requested tools and arguments.</li>
+  <li><strong>Execution Execution</strong>: Wayang captures these tool calls and seamlessly invokes the appropriate tools within the <code class="language-plaintext highlighter-rouge">ToolRegistry</code>.</li>
+  <li><strong>Observation &amp; Context Extension</strong>: Wayang records the execution result (or execution error) and appends it to the multi-turn memory graph as a <code class="language-plaintext highlighter-rouge">Tool Message</code>.</li>
+  <li><strong>Re-Inference</strong>: Wayang loops back around to the Inference Model, supplying the fresh execution context. The agent “observes” the outcome and either requests further tools or decides it has enough context to satisfy the objective.</li>
+</ol>
+
+<h3 id="sequence-diagram-tool-execution-loop">Sequence Diagram: Tool Execution Loop</h3>
+
+<pre><code class="language-mermaid">sequenceDiagram
+  participant User as Client/Orchestrator
+  participant Executor as SkillBasedAgentExecutor
+  participant Inference as GollekInferenceService
+  participant Tools as ToolRegistry
+  participant LLM as Inference Provider (OpenAI, Anthropic, etc.)
+
+  User-&gt;&gt;Executor: Execute Skill (with Tools)
+  activate Executor
+  
+  loop ReAct Iteration Loop (Max Iterations Guard)
+    Executor-&gt;&gt;Inference: Build Multi-Turn Context &amp; Request Inference
+    Inference-&gt;&gt;LLM: Stream Inference Request
+    
+    alt Model requests Tool
+      LLM--&gt;&gt;Inference: Finish Reason = TOOL_CALLS
+      Inference-&gt;&gt;Tools: Execute requested Tool(s)
+      Tools--&gt;&gt;Inference: Return Tool Result(s)
+      Inference--&gt;&gt;Inference: Append Tools/Results to Conversation History
+    else Model provides Answer
+      LLM--&gt;&gt;Inference: Finish Reason = STOP
+      Inference--&gt;&gt;Executor: Final Agent Inference Response
+    end
+  end
+  
+  Executor--&gt;&gt;User: Return enriched AgentExecutionResult (with Audit info)
+  deactivate Executor
+</code></pre>
+
+<hr />
+
+<h2 id="️-tracing-and-multi-turn-context">🛠️ Tracing and Multi-Turn Context</h2>
+
+<p>All context is retained across iteration loops automatically by appending past conversational turns to <code class="language-plaintext highlighter-rouge">AgentInferenceRequest.conversationHistory</code>.</p>
+
+<p>Every loop effectively tracks:</p>
+<ul>
+  <li>System Persona Prompt</li>
+  <li>Past Iterations (The user input + agent outputs + tool execution outputs)</li>
+  <li>Current prompt context</li>
+</ul>
+
+<h3 id="auditing-tool-output">Auditing Tool Output</h3>
+<p>To give observability into the decisions the LLM takes, the executor maintains an accurate audit trace in <code class="language-plaintext highlighter-rouge">AgentExecutionResult</code>.</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"SUCCESS"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"content"</span><span class="p">:</span><span class="w"> </span><span class="s2">"The weather in Seattle is rainy today."</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"reactIterations"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"finishReason"</span><span class="p">:</span><span class="w"> </span><span class="s2">"STOP"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"toolExecutions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+       </span><span class="nl">"toolName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"weather_api"</span><span class="p">,</span><span class="w">
+       </span><span class="nl">"durationMs"</span><span class="p">:</span><span class="w"> </span><span class="mi">412</span><span class="p">,</span><span class="w">
+       </span><span class="nl">"error"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>This ensures full transparency over agent tool behavior, latency, and success/failure characteristics without digging into debug logs.</p>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>Wayang AI Docs</span>
+      <a href="https://github.com/wayang-ai/wayang-platform">wayang-ai/wayang-platform</a>
+    </div>
+  </footer>
+</body>
+</html>

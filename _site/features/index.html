@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Features | Wayang AI</title>
+  <meta name="description" content="Wayang AI documentation and platform guides for building agentic workflows.">
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('wayang-theme');
+        var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        var theme = stored || (prefersLight ? 'light' : 'dark');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <div class="site-bg" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand">Wayang AI</a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="/docs/">Docs</a>
+        <a href="/docs/javadoc">Javadoc</a>
+        <a href="/features/">Features</a>
+        <a href="/about/">About</a>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme">Theme</button>
+        <a href="https://github.com/wayang-ai/wayang-platform">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container content-shell">
+    <h1 id="features">Features</h1>
+
+<p>Wayang AI provides a comprehensive set of tools for building and deploying AI agent workflows.</p>
+
+<hr />
+
+<h2 id="core-capabilities">Core Capabilities</h2>
+
+<h3 id="-visual-workflow-designer">🎨 Visual Workflow Designer</h3>
+
+<p>Design complex AI workflows with an intuitive drag-and-drop interface.</p>
+
+<ul>
+  <li><strong>Node-Based Editor</strong> - Connect agents, tools, and logic blocks visually</li>
+  <li><strong>Real-Time Preview</strong> - See your workflow structure as you build</li>
+  <li><strong>Template Library</strong> - Start from pre-built templates for common patterns</li>
+  <li><strong>Version Control</strong> - Track changes and collaborate with your team</li>
+</ul>
+
+<h3 id="-intelligent-agent-system">🤖 Intelligent Agent System</h3>
+
+<p>Build sophisticated agents powered by state-of-the-art AI models and a flexible architecture.</p>
+
+<ul>
+  <li><strong>Skill-Based Architecture</strong> - Data-driven personas (JSON) replace hardcoded agent types</li>
+  <li><strong>Unified Executor</strong> - One engine handles all agent skills with optimized inference</li>
+  <li><strong>Multi-LLM Support</strong> - Works with OpenAI, Anthropic, Google, and open-source models</li>
+  <li><strong>Memory &amp; Context</strong> - Persistent memory for long-running conversations</li>
+  <li><strong>Tool Integration</strong> - Connect agents to APIs, databases, and external services</li>
+  <li><strong>Orchestrator-Controlled Loops</strong> - Orchestrator coordinates planner -&gt; executor -&gt; evaluator iterations until done</li>
+</ul>
+
+<h3 id="-execution-engine">⚡ Execution Engine</h3>
+
+<p>High-performance runtime for reliable workflow execution.</p>
+
+<ul>
+  <li><strong>Parallel Processing</strong> - Run multiple agents concurrently</li>
+  <li><strong>Error Handling</strong> - Built-in retry logic and graceful failure recovery</li>
+  <li><strong>State Management</strong> - Track workflow state across executions</li>
+  <li><strong>Scalability</strong> - From local development to production clusters</li>
+</ul>
+
+<h3 id="-wayang-assistant">🧭 Wayang Assistant</h3>
+
+<p>An internal assistant that helps users build, understand, and troubleshoot Wayang.</p>
+
+<ul>
+  <li><strong>Ask &amp; Learn</strong> - Answers questions using official documentation</li>
+  <li><strong>Interactive Chat (RAG)</strong> - Stateful conversations with context-aware document retrieval</li>
+  <li><strong>Project Generator</strong> - Builds Wayang projects from natural language intent</li>
+  <li><strong>Troubleshooting</strong> - Automated error diagnosis with step-by-step guidance</li>
+</ul>
+
+<h3 id="-extensible-architecture">🔌 Extensible Architecture</h3>
+
+<p>Extend Wayang AI to fit your needs.</p>
+
+<ul>
+  <li><strong>Plugin System</strong> - Add custom agents, tools, and connectors</li>
+  <li><strong>API Access</strong> - Full REST and GraphQL APIs for programmatic control</li>
+  <li><strong>Webhooks</strong> - Trigger workflows from external events</li>
+  <li><strong>SDK</strong> - TypeScript and Python SDKs for custom integrations</li>
+</ul>
+
+<hr />
+
+<h2 id="platform-features">Platform Features</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Feature</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Workflow Orchestration</strong></td>
+      <td>Coordinate multiple agents with complex dependencies and conditions</td>
+    </tr>
+    <tr>
+      <td><strong>Agent Role Separation</strong></td>
+      <td>Keep planning, execution, evaluation, and control-loop decisions in dedicated agents</td>
+    </tr>
+    <tr>
+      <td><strong>Human-in-the-Loop</strong></td>
+      <td>Pause workflows for human review and approval</td>
+    </tr>
+    <tr>
+      <td><strong>Scheduling</strong></td>
+      <td>Run workflows on cron schedules or triggered events</td>
+    </tr>
+    <tr>
+      <td><strong>Monitoring</strong></td>
+      <td>Real-time dashboards and alerting for workflow execution</td>
+    </tr>
+    <tr>
+      <td><strong>Logging</strong></td>
+      <td>Comprehensive audit trails and execution logs</td>
+    </tr>
+    <tr>
+      <td><strong>Secrets Management</strong></td>
+      <td>Secure storage for API keys and credentials</td>
+    </tr>
+    <tr>
+      <td><strong>Team Collaboration</strong></td>
+      <td>Shared workspaces, roles, and permissions</td>
+    </tr>
+    <tr>
+      <td><strong>Export/Import</strong></td>
+      <td>Share workflows as portable JSON configurations</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="integration-ecosystem">Integration Ecosystem</h2>
+
+<h3 id="supported-ai-models">Supported AI Models</h3>
+
+<ul>
+  <li>OpenAI GPT-4, GPT-4 Turbo, GPT-3.5</li>
+  <li>Anthropic Claude 3, Claude 2</li>
+  <li>Google Gemini Pro, PaLM 2</li>
+  <li>Meta Llama 2, Llama 3</li>
+  <li>Mistral AI models</li>
+  <li>Local models via Ollama, LM Studio</li>
+</ul>
+
+<h3 id="built-in-connectors">Built-in Connectors</h3>
+
+<ul>
+  <li><strong>Databases</strong> - PostgreSQL, MySQL, MongoDB, Redis</li>
+  <li><strong>Cloud Storage</strong> - AWS S3, Google Cloud Storage, Azure Blob</li>
+  <li><strong>Communication</strong> - Slack, Discord, Email, SMS</li>
+  <li><strong>Productivity</strong> - Notion, Confluence, Google Workspace</li>
+  <li><strong>Development</strong> - GitHub, GitLab, Jira, Linear</li>
+</ul>
+
+<hr />
+
+<h2 id="security--compliance">Security &amp; Compliance</h2>
+
+<ul>
+  <li>🔒 <strong>End-to-End Encryption</strong> - All data encrypted in transit and at rest</li>
+  <li>🔐 <strong>SSO/SAML</strong> - Enterprise authentication integration</li>
+  <li>📋 <strong>Audit Logs</strong> - Complete history of all actions and changes</li>
+  <li>🛡️ <strong>Role-Based Access</strong> - Fine-grained permissions and access control</li>
+  <li>✅ <strong>SOC 2 Ready</strong> - Built with enterprise compliance in mind</li>
+</ul>
+
+<hr />
+
+<h2 id="performance-benchmarks">Performance Benchmarks</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Metric</th>
+      <th>Performance</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Workflow Startup</td>
+      <td>&lt; 100ms</td>
+    </tr>
+    <tr>
+      <td>Agent Response Time</td>
+      <td>&lt; 500ms (typical)</td>
+    </tr>
+    <tr>
+      <td>Concurrent Workflows</td>
+      <td>10,000+</td>
+    </tr>
+    <tr>
+      <td>API Throughput</td>
+      <td>50,000+ req/sec</td>
+    </tr>
+    <tr>
+      <td>Uptime SLA</td>
+      <td>99.9%</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<p><a href="/docs/">Get Started</a>   <a href="/docs/">View Documentation</a></p>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>Wayang AI Docs</span>
+      <a href="https://github.com/wayang-ai/wayang-platform">wayang-ai/wayang-platform</a>
+    </div>
+  </footer>
+</body>
+</html>

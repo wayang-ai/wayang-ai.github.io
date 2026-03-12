@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gollek SDK Gateway & SPI | Wayang AI</title>
+  <meta name="description" content="Wayang AI documentation and platform guides for building agentic workflows.">
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('wayang-theme');
+        var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        var theme = stored || (prefersLight ? 'light' : 'dark');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <div class="site-bg" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand">Wayang AI</a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="/docs/">Docs</a>
+        <a href="/docs/javadoc">Javadoc</a>
+        <a href="/features/">Features</a>
+        <a href="/about/">About</a>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme">Theme</button>
+        <a href="https://github.com/wayang-ai/wayang-platform">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container content-shell">
+    <h1 id="gollek-sdk-gateway--spi">Gollek SDK Gateway &amp; SPI</h1>
+
+<p>Wayang AI’s core inference engine relies on the <strong>Gollek SDK</strong>, a unified facade and SPI (Service Provider Interface) that connects Wayang to virtually any generative AI or embedded execution model.</p>
+
+<hr />
+
+<h2 id="-the-gollek-sdk-spi-architecture">🔌 The <code class="language-plaintext highlighter-rouge">gollek-sdk</code> SPI Architecture</h2>
+
+<p>Wayang decoupled from hardcoded dependency modules entirely, instead wiring its engine up only to <code class="language-plaintext highlighter-rouge">tech.kayys.gollek:gollek-sdk</code>.</p>
+
+<p>The SDK acts as an ecosystem bridge, enabling:</p>
+<ul>
+  <li><strong>Dynamic Provider Discovery</strong>: Local runtime JVMs discover supported models via ServiceLoaders (e.g., picking up <code class="language-plaintext highlighter-rouge">OpenAIProvider</code>, <code class="language-plaintext highlighter-rouge">AnthropicProvider</code>, <code class="language-plaintext highlighter-rouge">OllamaProvider</code>).</li>
+  <li><strong>Unified DTOs</strong>: Consistent data transfer patterns (<code class="language-plaintext highlighter-rouge">InferenceRequest</code>, <code class="language-plaintext highlighter-rouge">Message</code>, <code class="language-plaintext highlighter-rouge">ToolCall</code>) regardless of the underlying LLM protocol quirks.</li>
+  <li><strong>MCP Server Discovery</strong>: Connects the inference engine with embedded or remote Model Context Protocol (MCP) servers seamlessly.</li>
+</ul>
+
+<h3 id="example-gollek-sdk-provider-registration-via-cdi">Example: Gollek SDK Provider Registration via CDI</h3>
+<p>Wayang’s internal <code class="language-plaintext highlighter-rouge">GollekSdkProducer</code> handles SDK instantiation efficiently at boot through standard Quarkus configurations:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Produces</span>
+<span class="nd">@ApplicationScoped</span>
+<span class="kd">public</span> <span class="nc">GollekSdk</span> <span class="nf">produceGollekSdk</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="nc">GollekSdk</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>
+            <span class="c1">// Customizes configuration hooks...</span>
+            <span class="o">.</span><span class="na">build</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="-streaming--chunk-delegation">🚀 Streaming &amp; Chunk Delegation</h2>
+
+<p>One of the largest benefits of moving inference generation through <code class="language-plaintext highlighter-rouge">gollek-sdk</code> is high-performance streaming. Through the SDK’s <code class="language-plaintext highlighter-rouge">inferStream</code> method, Wayang’s <code class="language-plaintext highlighter-rouge">SkillBasedAgentExecutor</code> handles generative streams natively.</p>
+
+<p>Rather than waiting for the entire loop to finish sequentially, Wayang’s agent API can surface <code class="language-plaintext highlighter-rouge">StreamChunk</code> emissions up to the end-users instantly, creating responsive front-end experiences out-of-the-box.</p>
+
+<hr />
+
+<h2 id="-model-context-protocol-mcp">🧩 Model Context Protocol (MCP)</h2>
+
+<p><code class="language-plaintext highlighter-rouge">gollek-sdk</code> natively bridges to standard Model Context Protocol servers. This means an agent can discover system-level tools, read local file systems, connect to remote GitHub actions, or search Slack.</p>
+
+<p>Wayang connects through <code class="language-plaintext highlighter-rouge">McpRegistryManager</code> during inference setup, enriching the prompt injection loop seamlessly!</p>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>Wayang AI Docs</span>
+      <a href="https://github.com/wayang-ai/wayang-platform">wayang-ai/wayang-platform</a>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Standalone Troubleshooting | Wayang AI</title>
+  <meta name="description" content="Wayang AI documentation and platform guides for building agentic workflows.">
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('wayang-theme');
+        var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        var theme = stored || (prefersLight ? 'light' : 'dark');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <div class="site-bg" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand">Wayang AI</a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="/docs/">Docs</a>
+        <a href="/docs/javadoc">Javadoc</a>
+        <a href="/features/">Features</a>
+        <a href="/about/">About</a>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme">Theme</button>
+        <a href="https://github.com/wayang-ai/wayang-platform">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container content-shell">
+    <h1 id="standalone-api-routing-and-troubleshooting">Standalone API Routing and Troubleshooting</h1>
+
+<h2 id="api-routing-note">API Routing Note</h2>
+
+<p><code class="language-plaintext highlighter-rouge">/api/v1/projects*</code> is now implemented in the core API module (<code class="language-plaintext highlighter-rouge">wayang/core/wayang-api</code>) and consumed by standalone runtime.</p>
+
+<p>Primary resource classes:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">tech.kayys.wayang.control.api.ProjectResource</code></li>
+  <li><code class="language-plaintext highlighter-rouge">tech.kayys.wayang.runtime.standalone.resource.ProjectExecutionsResource</code></li>
+</ul>
+
+<h2 id="system-requirements">System Requirements</h2>
+
+<p>Wayang AI Platform now requires <strong>JDK 25</strong> and <strong>Quarkus 3.32.2+</strong>.</p>
+
+<p>Key technical changes:</p>
+<ul>
+  <li>Native support for JDK 25 Foreign Function &amp; Memory (FFM).</li>
+  <li>Hibernate Reactive support is standard in standalone runtime.</li>
+</ul>
+
+<h2 id="startup-troubleshooting">Startup Troubleshooting</h2>
+
+<h3 id="0-sql-reserved-keyword-conflict-key-value">0) SQL Reserved Keyword Conflict (<code class="language-plaintext highlighter-rouge">key</code>, <code class="language-plaintext highlighter-rouge">value</code>)</h3>
+
+<p><strong>Symptom:</strong></p>
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(JPA Startup Thread) GenerationTarget encountered exception: Syntax error in SQL statement "create table memory_metadata ([*]key varchar(255) ...
+</code></pre></div></div>
+
+<p><strong>Cause:</strong>
+Legacy entities used the reserved keyword <code class="language-plaintext highlighter-rouge">key</code> as a column name, which is prohibited in modern H2 and PostgreSQL versions.</p>
+
+<p><strong>Fix:</strong>
+All metadata tables have been standardized to use <code class="language-plaintext highlighter-rouge">metadata_key</code> and <code class="language-plaintext highlighter-rouge">metadata_value</code>. Ensure your <code class="language-plaintext highlighter-rouge">import.sql</code> or custom schema matches these column names.</p>
+
+<h3 id="1-classnotfoundexception-for-controlplaneregistry">1) <code class="language-plaintext highlighter-rouge">ClassNotFoundException</code> for <code class="language-plaintext highlighter-rouge">ControlPlane*Registry</code></h3>
+
+<p>Symptom:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Caused by: java.lang.ClassNotFoundException: ControlPlaneNodeRegistry
+</code></pre></div></div>
+
+<p>Cause:</p>
+
+<ul>
+  <li>stale/corrupted compiled classes in <code class="language-plaintext highlighter-rouge">target/</code></li>
+  <li>stale local SNAPSHOT jars after incremental changes</li>
+  <li>standalone index dependency still points to legacy artifact name</li>
+</ul>
+
+<p>Fix:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Rebuild and reinstall core modules used by runtime</span>
+mvn <span class="nt">-f</span> wayang/core/wayang-control-core/pom.xml <span class="nt">-DskipTests</span> <span class="nt">-nsu</span> clean <span class="nb">install
+</span>mvn <span class="nt">-f</span> wayang/core/wayang-api/pom.xml <span class="nt">-DskipTests</span> <span class="nt">-nsu</span> clean <span class="nb">install</span>
+
+<span class="c"># Rebuild standalone runtime cleanly</span>
+mvn <span class="nt">-f</span> wayang/runtime/wayang-runtime-standalone/pom.xml <span class="nt">-DskipTests</span> <span class="nt">-nsu</span> clean compile
+</code></pre></div></div>
+
+<p>Ensure runtime indexes the centralized API artifact:</p>
+
+<div class="language-properties highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="py">quarkus.index-dependency.wayang-api.group-id</span><span class="p">=</span><span class="s">tech.kayys.wayang</span>
+<span class="py">quarkus.index-dependency.wayang-api.artifact-id</span><span class="p">=</span><span class="s">wayang-api</span>
+</code></pre></div></div>
+
+<h3 id="2-pad-letter-p-must-be-followed-by-valid-pad-pattern">2) <code class="language-plaintext highlighter-rouge">Pad letter 'p' must be followed by valid pad pattern</code></h3>
+
+<p>Symptom:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>IllegalArgumentException: Pad letter 'p' must be followed by valid pad pattern
+</code></pre></div></div>
+
+<p>Cause:</p>
+
+<ul>
+  <li>malformed log format expression parsing</li>
+</ul>
+
+<p>Fix:</p>
+
+<div class="language-properties highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="py">quarkus.log.file.format</span><span class="p">=</span><span class="s">%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c{2.}] (%t) %s%e%n</span>
+</code></pre></div></div>
+
+<p>Avoid nested <code class="language-plaintext highlighter-rouge">${...}</code> defaults containing <code class="language-plaintext highlighter-rouge">%d{...}</code> or <code class="language-plaintext highlighter-rouge">%c{...}</code> in the same expression.</p>
+
+<h2 id="telemetry-quickstart">Telemetry Quickstart</h2>
+
+<p>Use these commands to inspect execution telemetry quickly.</p>
+
+<h3 id="1-base-aggregation">1) Base Aggregation</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/executions/{executionId}/telemetry"</span>
+</code></pre></div></div>
+
+<h3 id="2-time-window--node-filter">2) Time Window + Node Filter</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/executions/{executionId}/telemetry?from=2026-03-07T00:00:00Z&amp;to=2026-03-07T01:00:00Z&amp;nodeId=orchestrator-node-1"</span>
+</code></pre></div></div>
+
+<h3 id="3-grouped-view">3) Grouped View</h3>
+
+<p>Group by node:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/executions/{executionId}/telemetry?groupBy=nodeId"</span>
+</code></pre></div></div>
+
+<p>Group by event type, sorted and limited:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/executions/{executionId}/telemetry?groupBy=type&amp;sort=tasksExecuted:desc&amp;limit=5"</span>
+</code></pre></div></div>
+
+<h3 id="4-include-raw-events-for-debugging">4) Include Raw Events for Debugging</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/executions/{executionId}/telemetry?includeRaw=true"</span>
+</code></pre></div></div>
+
+<h3 id="5-what-to-look-at-first">5) What to Look At First</h3>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">counters.delegationFailures</code> and <code class="language-plaintext highlighter-rouge">counters.delegationTimeouts</code> for stability issues</li>
+  <li><code class="language-plaintext highlighter-rouge">latestBudget.maxAgentLatencyMs</code> and <code class="language-plaintext highlighter-rouge">latestBudget.maxRetriesPerDelegation</code> for guardrail tuning</li>
+  <li>grouped output (<code class="language-plaintext highlighter-rouge">groupBy=nodeId</code>) to identify the hottest/failing node</li>
+</ul>
+
+<h2 id="debugger-snapshot-quickstart">Debugger Snapshot Quickstart</h2>
+
+<p>For one-shot troubleshooting payloads (status + events + telemetry + lineage), use:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="s2">"http://localhost:31713/api/v1/debug/projects/{projectId}/executions/{executionId}/snapshot?includeRaw=true&amp;eventsLimit=200"</span>
+</code></pre></div></div>
+
+<p>Related debug endpoints:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">/api/v1/debug/projects/{projectId}/executions/{executionId}/events</code></li>
+  <li><code class="language-plaintext highlighter-rouge">/api/v1/debug/projects/{projectId}/executions/{executionId}/telemetry</code></li>
+  <li><code class="language-plaintext highlighter-rouge">/api/v1/debug/projects/{projectId}/executions/{executionId}/lineage</code></li>
+  <li><code class="language-plaintext highlighter-rouge">/api/v1/debug/projects/{projectId}/executions/{executionId}/snapshot</code></li>
+</ul>
+
+<h2 id="assistant-troubleshooting-api">Assistant Troubleshooting API</h2>
+
+<p>If you want automated guidance for an error message, call the Wayang Assistant troubleshoot endpoint:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-X</span> POST <span class="s2">"http://localhost:31713/api/v1/assistant/troubleshoot"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span> <span class="se">\</span>
+  <span class="nt">-d</span> <span class="s1">'{
+    "errorMessage": "Unsatisfied dependency for type ControlPlaneExecutorRegistry"
+  }'</span>
+</code></pre></div></div>
+
+<p>Related:</p>
+
+<ul>
+  <li><a href="./wayang-assistant">Wayang Assistant</a></li>
+</ul>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>Wayang AI Docs</span>
+      <a href="https://github.com/wayang-ai/wayang-platform">wayang-ai/wayang-platform</a>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Schema Catalog | Wayang AI</title>
+  <meta name="description" content="Wayang AI documentation and platform guides for building agentic workflows.">
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('wayang-theme');
+        var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        var theme = stored || (prefersLight ? 'light' : 'dark');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <div class="site-bg" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand">Wayang AI</a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="/docs/">Docs</a>
+        <a href="/docs/javadoc">Javadoc</a>
+        <a href="/features/">Features</a>
+        <a href="/about/">About</a>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme">Theme</button>
+        <a href="https://github.com/wayang-ai/wayang-platform">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container content-shell">
+    <h1 id="schema-catalog-and-wayangspec">Schema Catalog and WayangSpec</h1>
+
+<p>Schema catalog endpoint:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="s2">"http://localhost:31713/v1/schema/catalog"</span>
+</code></pre></div></div>
+
+<p>Get a specific schema:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="s2">"http://localhost:31713/v1/schema/catalog/{schemaId}"</span>
+</code></pre></div></div>
+
+<h2 id="key-semantics">Key Semantics</h2>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">wayang-spec</code> is the single source of truth for full workflow/spec payload structure.</li>
+  <li><code class="language-plaintext highlighter-rouge">workflow-spec</code> is supported as an alias to <code class="language-plaintext highlighter-rouge">wayang-spec</code> for compatibility.</li>
+  <li><code class="language-plaintext highlighter-rouge">workflow</code> is a simpler legacy node/connection schema and is not equivalent to <code class="language-plaintext highlighter-rouge">wayang-spec</code>.</li>
+</ul>
+
+<h2 id="built-in-schema-coverage">Built-In Schema Coverage</h2>
+
+<p>Catalog includes built-in schemas from core and executors, including:</p>
+
+<ul>
+  <li>agent (<code class="language-plaintext highlighter-rouge">agent-config</code>, <code class="language-plaintext highlighter-rouge">agent-orchestrator</code>, <code class="language-plaintext highlighter-rouge">agent-planner</code>, <code class="language-plaintext highlighter-rouge">agent-coder</code>, <code class="language-plaintext highlighter-rouge">agent-evaluator</code>, <code class="language-plaintext highlighter-rouge">agent-basic</code>, <code class="language-plaintext highlighter-rouge">agent-analytic</code>)</li>
+  <li>RAG (<code class="language-plaintext highlighter-rouge">rag-executor</code> and related response/retrieval/generation schemas)</li>
+  <li>memory (<code class="language-plaintext highlighter-rouge">memory-*</code>)</li>
+  <li>EIP (<code class="language-plaintext highlighter-rouge">eip-*</code>, <code class="language-plaintext highlighter-rouge">dead-letter-channel</code>)</li>
+  <li>HITL (<code class="language-plaintext highlighter-rouge">hitl-human-task</code>)</li>
+  <li>tool (<code class="language-plaintext highlighter-rouge">tool-http</code>, <code class="language-plaintext highlighter-rouge">tool-sandbox</code>, <code class="language-plaintext highlighter-rouge">tool-mcp</code>, <code class="language-plaintext highlighter-rouge">tool-utcp</code>, <code class="language-plaintext highlighter-rouge">tool-rest</code>)</li>
+  <li>vector + embedding + web search (<code class="language-plaintext highlighter-rouge">vector-*</code>, <code class="language-plaintext highlighter-rouge">embedding-generate</code>, <code class="language-plaintext highlighter-rouge">web_search</code>)</li>
+</ul>
+
+<h2 id="project-execution-payload">Project Execution Payload</h2>
+
+<p>Dedicated endpoint contract and sharing examples are also documented in <a href="./projects-api">Projects API</a>.</p>
+
+<p>Project execution accepts <code class="language-plaintext highlighter-rouge">spec</code>, <code class="language-plaintext highlighter-rouge">wayangSpec</code>, or <code class="language-plaintext highlighter-rouge">workflowSpec</code> keys:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-X</span> POST <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/executions"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"X-Tenant-Id: community"</span> <span class="se">\</span>
+  <span class="nt">-d</span> <span class="s1">'{
+    "name": "demo-execution",
+    "spec": { "workflow": { "name": "Demo" } }
+  }'</span>
+</code></pre></div></div>
+
+<p>Dry-run validation (no workflow run is started):</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-X</span> POST <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/executions"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"X-Tenant-Id: community"</span> <span class="se">\</span>
+  <span class="nt">-d</span> <span class="s1">'{
+    "name": "demo-dry-run",
+    "dryRun": true,
+    "spec": { "workflow": { "name": "Demo" } }
+  }'</span>
+</code></pre></div></div>
+
+<p>Supported flags: <code class="language-plaintext highlighter-rouge">dryRun</code> or <code class="language-plaintext highlighter-rouge">validateOnly</code> (either enables validation-only mode).</p>
+
+<h3 id="sub-workflow--custom-agent-node">Sub-Workflow / Custom Agent Node</h3>
+
+<p>Saved projects can now be embedded as sub-workflows using node types:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">sub-workflow</code></li>
+  <li><code class="language-plaintext highlighter-rouge">custom-agent-node</code> (alias)</li>
+</ul>
+
+<p>Execution behavior:</p>
+
+<ul>
+  <li>Parent graph expands sub-workflow nodes before runtime execution.</li>
+  <li>Parent-to-child and child-to-parent edges are rewired automatically.</li>
+  <li>Parent effectively waits for child completion because child graph is inlined synchronously.</li>
+  <li>Default depth guard is <code class="language-plaintext highlighter-rouge">2</code> (configurable per request with <code class="language-plaintext highlighter-rouge">maxSubWorkflowDepth</code>, clamped <code class="language-plaintext highlighter-rouge">1..5</code>).</li>
+  <li>Cycle detection rejects recursive project references.</li>
+</ul>
+
+<p>Node configuration example:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"sub-workflow"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"configuration"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"projectId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"b8ef8f37-7d9a-41a5-92a9-bf5cd95ef89c"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"projectVersion"</span><span class="p">:</span><span class="w"> </span><span class="s2">"v2"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"inputs"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"ticketId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"INC-123"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"priority"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nl">"outputBindings"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"summary"</span><span class="p">:</span><span class="w"> </span><span class="s2">"context.child.summary"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nl">"wayangSpec"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"specVersion"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.0.0"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"workflow"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"nodes"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+        </span><span class="nl">"connections"</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nl">"maxDepth"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Execution request example:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"parent-with-children"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"maxSubWorkflowDepth"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"spec"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"specVersion"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.0.0"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"workflow"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"nodes"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+      </span><span class="nl">"connections"</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<h3 id="designer-contract-custom-agent-node">Designer Contract: Custom Agent Node</h3>
+
+<p>For <code class="language-plaintext highlighter-rouge">wayang-ui</code> custom reusable agent/sub-workflow node, use:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">type</code>: <code class="language-plaintext highlighter-rouge">custom-agent-node</code> (or <code class="language-plaintext highlighter-rouge">sub-workflow</code>)</li>
+  <li><code class="language-plaintext highlighter-rouge">metadata.id</code>: stable node id</li>
+  <li><code class="language-plaintext highlighter-rouge">configuration.projectId</code>: referenced saved project id</li>
+  <li>optional <code class="language-plaintext highlighter-rouge">configuration.wayangSpec</code>: inline sub-workflow payload override</li>
+  <li>optional <code class="language-plaintext highlighter-rouge">maxSubWorkflowDepth</code> in execution request</li>
+</ul>
+
+<p>Preferred frontend behavior:</p>
+
+<ul>
+  <li>frontend should send reference-only node payload (<code class="language-plaintext highlighter-rouge">configuration.projectId</code>)</li>
+  <li>frontend should not copy/embed full child workflow payload into parent payload by default</li>
+  <li>runtime loads child payload from saved project metadata when execution request arrives</li>
+  <li>inline <code class="language-plaintext highlighter-rouge">configuration.wayangSpec</code> is supported as an override/fallback, but not required for normal UI flow</li>
+  <li>for parameterized callable children, frontend should populate <code class="language-plaintext highlighter-rouge">configuration.inputs</code> (or <code class="language-plaintext highlighter-rouge">parameters</code> / <code class="language-plaintext highlighter-rouge">inputBindings</code>)</li>
+  <li>frontend may pin <code class="language-plaintext highlighter-rouge">configuration.projectVersion</code> for deterministic child contract execution</li>
+  <li>frontend may map child outputs with <code class="language-plaintext highlighter-rouge">configuration.outputBindings</code> based on declared callable output schema</li>
+  <li>UI should use <code class="language-plaintext highlighter-rouge">GET /api/v1/projects/shareable?mode=callable</code> and display <code class="language-plaintext highlighter-rouge">callable.inputs</code> + <code class="language-plaintext highlighter-rouge">callable.output</code> for mapping</li>
+</ul>
+
+<h3 id="share--consent-metadata-standalone--enterprise-compatible">Share / Consent Metadata (Standalone + Enterprise-Compatible)</h3>
+
+<p>Store access policy in project metadata:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"metadata"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"access"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"ownerTenantId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tenant-a"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"ownerUserId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"alice"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"visibility"</span><span class="p">:</span><span class="w"> </span><span class="s2">"private"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"sharedWithUsers"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"bob"</span><span class="p">],</span><span class="w">
+      </span><span class="nl">"sharedWithTenants"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"tenant-b"</span><span class="p">],</span><span class="w">
+      </span><span class="nl">"requireConsent"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"consentGrants"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"tenantId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tenant-b"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"userId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"bob"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"permission"</span><span class="p">:</span><span class="w"> </span><span class="s2">"execute_subworkflow"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">]</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Resolver rules:</p>
+
+<ul>
+  <li>owner always allowed</li>
+  <li><code class="language-plaintext highlighter-rouge">visibility=private</code>: owner/share only (standalone fallback allows same-tenant when user identity is absent)</li>
+  <li><code class="language-plaintext highlighter-rouge">visibility=tenant</code>: same tenant or explicit share</li>
+  <li><code class="language-plaintext highlighter-rouge">visibility=explicit</code>: explicit share only (plus owner)</li>
+  <li><code class="language-plaintext highlighter-rouge">visibility=public</code>: open reference</li>
+  <li>if <code class="language-plaintext highlighter-rouge">requireConsent=true</code>, non-owner access also needs matching <code class="language-plaintext highlighter-rouge">consentGrants.permission=execute_subworkflow</code></li>
+</ul>
+
+<h4 id="end-to-end-sharing-examples">End-to-End Sharing Examples</h4>
+
+<ol>
+  <li>Owner creates child project (<code class="language-plaintext highlighter-rouge">tenant-a</code> / <code class="language-plaintext highlighter-rouge">alice</code>) as private:</li>
+</ol>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-X</span> POST <span class="s2">"http://localhost:31713/api/v1/projects"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"X-Tenant-Id: tenant-a"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"X-User-Id: alice"</span> <span class="se">\</span>
+  <span class="nt">-d</span> <span class="s1">'{
+    "name": "shared-child-project",
+    "metadata": {
+      "createdBy": "alice",
+      "access": {
+        "ownerTenantId": "tenant-a",
+        "ownerUserId": "alice",
+        "visibility": "private",
+        "requireConsent": false
+      }
+    },
+    "spec": {
+      "specVersion": "1.0.0",
+      "workflow": { "nodes": [], "connections": [] }
+    }
+  }'</span>
+</code></pre></div></div>
+
+<ol>
+  <li>Owner updates sharing for cross-tenant execution (<code class="language-plaintext highlighter-rouge">tenant-b</code> / <code class="language-plaintext highlighter-rouge">bob</code>):</li>
+</ol>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-X</span> PUT <span class="s2">"http://localhost:31713/api/v1/projects/{childProjectId}"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"X-Tenant-Id: tenant-a"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"X-User-Id: alice"</span> <span class="se">\</span>
+  <span class="nt">-d</span> <span class="s1">'{
+    "metadata": {
+      "access": {
+        "ownerTenantId": "tenant-a",
+        "ownerUserId": "alice",
+        "visibility": "explicit",
+        "sharedWithTenants": ["tenant-b"],
+        "sharedWithUsers": ["bob"],
+        "requireConsent": false
+      }
+    }
+  }'</span>
+</code></pre></div></div>
+
+<ol>
+  <li>Parent execution by requester (<code class="language-plaintext highlighter-rouge">tenant-b</code> / <code class="language-plaintext highlighter-rouge">bob</code>) referencing child by <code class="language-plaintext highlighter-rouge">projectId</code>:</li>
+</ol>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-X</span> POST <span class="s2">"http://localhost:31713/api/v1/projects/{parentProjectId}/executions"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"X-Tenant-Id: tenant-b"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"X-User-Id: bob"</span> <span class="se">\</span>
+  <span class="nt">-d</span> <span class="s1">'{
+    "name": "parent-uses-shared-child",
+    "spec": {
+      "specVersion": "1.0.0",
+      "workflow": {
+        "nodes": [
+          {
+            "metadata": { "id": "child-node-1" },
+            "type": "custom-agent-node",
+            "configuration": {
+              "projectId": "{childProjectId}"
+            }
+          }
+        ],
+        "connections": []
+      }
+    }
+  }'</span>
+</code></pre></div></div>
+
+<ol>
+  <li>Consent-required variant (<code class="language-plaintext highlighter-rouge">requireConsent=true</code>) with grant:</li>
+</ol>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"metadata"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"access"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"ownerTenantId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tenant-a"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"ownerUserId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"alice"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"visibility"</span><span class="p">:</span><span class="w"> </span><span class="s2">"explicit"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"sharedWithUsers"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"bob"</span><span class="p">],</span><span class="w">
+      </span><span class="nl">"sharedWithTenants"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"tenant-b"</span><span class="p">],</span><span class="w">
+      </span><span class="nl">"requireConsent"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"consentGrants"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"tenantId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tenant-b"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"userId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"bob"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"permission"</span><span class="p">:</span><span class="w"> </span><span class="s2">"execute_subworkflow"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">]</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>If <code class="language-plaintext highlighter-rouge">requireConsent=true</code> and no matching grant exists, sub-workflow expansion is denied during execution submission.</p>
+
+<p>Minimal node fragment:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"metadata"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"custom-reusable-1"</span><span class="w"> </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"custom-agent-node"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"configuration"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"projectId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"fbb9d7b8-2f67-4ef0-a340-0b729fa5a357"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Execution semantics:</p>
+
+<ul>
+  <li>backend expands referenced child project workflow into parent graph</li>
+  <li>parent inbound/outbound edges are bridged to child entry/exit nodes</li>
+  <li>expansion is synchronous, so parent flow continues after child branch completion</li>
+  <li>recursive references are rejected (<code class="language-plaintext highlighter-rouge">cycle detected</code>)</li>
+</ul>
+
+<p>Execution responses include <code class="language-plaintext highlighter-rouge">subWorkflowResolution</code> when expansion is applied:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">childReferences</code></li>
+  <li><code class="language-plaintext highlighter-rouge">childrenResolved</code></li>
+  <li><code class="language-plaintext highlighter-rouge">expandedNodeCount</code></li>
+  <li><code class="language-plaintext highlighter-rouge">maxDepthApplied</code></li>
+</ul>
+
+<p>Execution submit idempotency:</p>
+
+<ul>
+  <li>send <code class="language-plaintext highlighter-rouge">Idempotency-Key</code> (or <code class="language-plaintext highlighter-rouge">X-Idempotency-Key</code>) header to deduplicate retries</li>
+  <li>alternatively include <code class="language-plaintext highlighter-rouge">idempotencyKey</code> in request body</li>
+  <li>duplicate submit with same key returns existing execution payload (<code class="language-plaintext highlighter-rouge">idempotentReplay: true</code>)</li>
+  <li>replay dedup also uses a TTL window field: <code class="language-plaintext highlighter-rouge">idempotencyReplayWindowSeconds</code></li>
+  <li>default replay TTL is runtime property <code class="language-plaintext highlighter-rouge">wayang.runtime.standalone.execution.idempotency.replay-window-seconds</code> (default <code class="language-plaintext highlighter-rouge">86400</code>)</li>
+  <li>set replay window to <code class="language-plaintext highlighter-rouge">0</code> to disable replay dedup for that submit</li>
+</ul>
+
+<p>Request correlation:</p>
+
+<ul>
+  <li>send <code class="language-plaintext highlighter-rouge">X-Request-Id</code> header (or <code class="language-plaintext highlighter-rouge">requestId</code> in request body) to propagate a stable request correlation id</li>
+  <li>API echoes it as <code class="language-plaintext highlighter-rouge">requestId</code> in execution response and stores it in execution event metadata</li>
+  <li>runtime timeline events also include <code class="language-plaintext highlighter-rouge">metadata.telemetry</code> for node-completed outputs (for orchestrator: budget and execution counters)
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">executorTelemetry.delegationAttempts</code></li>
+      <li><code class="language-plaintext highlighter-rouge">executorTelemetry.delegationRetries</code></li>
+      <li><code class="language-plaintext highlighter-rouge">executorTelemetry.delegationFailures</code></li>
+      <li><code class="language-plaintext highlighter-rouge">executorTelemetry.delegationTimeouts</code></li>
+    </ul>
+  </li>
+  <li>aggregated runtime telemetry endpoint:
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">GET /api/v1/projects/{projectId}/executions/{executionId}/telemetry</code></li>
+      <li>optional filters: <code class="language-plaintext highlighter-rouge">from</code> (ISO instant), <code class="language-plaintext highlighter-rouge">to</code> (ISO instant), <code class="language-plaintext highlighter-rouge">nodeId</code>, <code class="language-plaintext highlighter-rouge">type</code></li>
+      <li>optional grouping: <code class="language-plaintext highlighter-rouge">groupBy=nodeId</code> or <code class="language-plaintext highlighter-rouge">groupBy=type</code></li>
+      <li>optional grouped result controls: <code class="language-plaintext highlighter-rouge">sort=&lt;field&gt;[:asc|desc]</code>, <code class="language-plaintext highlighter-rouge">limit=&lt;n&gt;</code></li>
+      <li>optional debug payload: <code class="language-plaintext highlighter-rouge">includeRaw=true</code> to include filtered <code class="language-plaintext highlighter-rouge">rawEvents</code></li>
+      <li>returns summed delegation counters and latest budget snapshot from execution timeline events</li>
+      <li>full endpoint reference and examples: <a href="./telemetry-api">Execution Telemetry API</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="agent-provider-and-vault-references">Agent Provider and Vault References</h2>
+
+<p><code class="language-plaintext highlighter-rouge">agent-config</code> supports explicit local/cloud provider selection and secret references:</p>
+
+<ul>
+  <li>
+    <table>
+      <tbody>
+        <tr>
+          <td><code class="language-plaintext highlighter-rouge">providerMode</code>: <code class="language-plaintext highlighter-rouge">auto</code></td>
+          <td><code class="language-plaintext highlighter-rouge">local</code></td>
+          <td><code class="language-plaintext highlighter-rouge">cloud</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">localProvider</code> / <code class="language-plaintext highlighter-rouge">cloudProvider</code></li>
+  <li><code class="language-plaintext highlighter-rouge">credentialRefs</code> (reference-only; no raw secret values)</li>
+  <li><code class="language-plaintext highlighter-rouge">vault</code> backend routing metadata</li>
+  <li>agent typed execution fields:
+    <ul>
+      <li>basic (<code class="language-plaintext highlighter-rouge">agent-basic</code>): general agent config + provider/vault fields</li>
+      <li>coder (<code class="language-plaintext highlighter-rouge">agent-coder</code>): <code class="language-plaintext highlighter-rouge">instruction</code>, optional <code class="language-plaintext highlighter-rouge">taskType</code> (default: <code class="language-plaintext highlighter-rouge">GENERATE</code>)</li>
+      <li>analytic (<code class="language-plaintext highlighter-rouge">agent-analytic</code>): <code class="language-plaintext highlighter-rouge">question</code>, optional <code class="language-plaintext highlighter-rouge">taskType</code> (default: <code class="language-plaintext highlighter-rouge">DESCRIPTIVE</code>)</li>
+      <li>planner (<code class="language-plaintext highlighter-rouge">agent-planner</code>): <code class="language-plaintext highlighter-rouge">goal</code>, <code class="language-plaintext highlighter-rouge">objective</code>, <code class="language-plaintext highlighter-rouge">instruction</code>, <code class="language-plaintext highlighter-rouge">strategy</code></li>
+      <li>evaluator (<code class="language-plaintext highlighter-rouge">agent-evaluator</code>): <code class="language-plaintext highlighter-rouge">candidateOutput</code>, <code class="language-plaintext highlighter-rouge">criteria</code> (with fallback from <code class="language-plaintext highlighter-rouge">output</code>/<code class="language-plaintext highlighter-rouge">result</code>/<code class="language-plaintext highlighter-rouge">content</code>)</li>
+      <li>orchestrator (<code class="language-plaintext highlighter-rouge">agent-orchestrator</code>): <code class="language-plaintext highlighter-rouge">objective</code> or (<code class="language-plaintext highlighter-rouge">agentTasks</code>, <code class="language-plaintext highlighter-rouge">orchestrationType</code>, <code class="language-plaintext highlighter-rouge">coordinationStrategy</code>)</li>
+    </ul>
+  </li>
+</ul>
+
+<p>During execution submission, standalone API also records a non-sensitive <code class="language-plaintext highlighter-rouge">agentConfigCoverage</code>
+summary in execution metadata/events (counts of provider configs and credential references;
+no secret values).
+When <code class="language-plaintext highlighter-rouge">credentialRefs[].path</code> is relative, execution applies <code class="language-plaintext highlighter-rouge">extensions.vault.pathPrefix</code>
+to build the effective secret path.
+For agent executors, runtime also forwards resolved credentials to inference by
+mapping <code class="language-plaintext highlighter-rouge">_resolvedCredentials</code> to Gollek <code class="language-plaintext highlighter-rouge">InferenceRequest.apiKey</code> using the
+selected provider (<code class="language-plaintext highlighter-rouge">preferredProvider</code> or provider-mode derived provider).
+Planner and evaluator executors prioritize typed schema fields above, then fallback
+to generic context keys for backward compatibility.</p>
+
+<h2 id="agent-type-input-mapping">Agent Type Input Mapping</h2>
+
+<p>Recommended typed fields per agent type:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">agent-basic</code>
+    <ul>
+      <li>execution: generic context payload for common tasks</li>
+      <li>provider selection: <code class="language-plaintext highlighter-rouge">providerMode</code>, <code class="language-plaintext highlighter-rouge">preferredProvider</code>, <code class="language-plaintext highlighter-rouge">localProvider</code>, <code class="language-plaintext highlighter-rouge">cloudProvider</code></li>
+    </ul>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">agent-coder</code>
+    <ul>
+      <li>execution: <code class="language-plaintext highlighter-rouge">instruction</code></li>
+      <li>optional: <code class="language-plaintext highlighter-rouge">taskType</code> (<code class="language-plaintext highlighter-rouge">GENERATE</code>, <code class="language-plaintext highlighter-rouge">REVIEW</code>, <code class="language-plaintext highlighter-rouge">REFACTOR</code>, <code class="language-plaintext highlighter-rouge">DEBUG</code>, <code class="language-plaintext highlighter-rouge">TEST</code>, …)</li>
+      <li>provider override: <code class="language-plaintext highlighter-rouge">preferredProvider</code></li>
+    </ul>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">agent-analytic</code>
+    <ul>
+      <li>execution: <code class="language-plaintext highlighter-rouge">question</code></li>
+      <li>optional: <code class="language-plaintext highlighter-rouge">taskType</code> (<code class="language-plaintext highlighter-rouge">DESCRIPTIVE</code>, …)</li>
+      <li>provider override: <code class="language-plaintext highlighter-rouge">preferredProvider</code></li>
+    </ul>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">agent-planner</code>
+    <ul>
+      <li>execution: <code class="language-plaintext highlighter-rouge">goal</code> (preferred), or <code class="language-plaintext highlighter-rouge">objective</code> / <code class="language-plaintext highlighter-rouge">instruction</code></li>
+      <li>optional: <code class="language-plaintext highlighter-rouge">strategy</code>, <code class="language-plaintext highlighter-rouge">preferredProvider</code></li>
+    </ul>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">agent-evaluator</code>
+    <ul>
+      <li>execution: <code class="language-plaintext highlighter-rouge">candidateOutput</code> (preferred), fallback <code class="language-plaintext highlighter-rouge">output</code> / <code class="language-plaintext highlighter-rouge">result</code> / <code class="language-plaintext highlighter-rouge">content</code></li>
+      <li>optional: <code class="language-plaintext highlighter-rouge">criteria</code>, <code class="language-plaintext highlighter-rouge">preferredProvider</code></li>
+    </ul>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">agent-orchestrator</code>
+    <ul>
+      <li>objective mode: <code class="language-plaintext highlighter-rouge">objective</code> (+ optional <code class="language-plaintext highlighter-rouge">taskType</code>, <code class="language-plaintext highlighter-rouge">preferredProvider</code>)</li>
+      <li>orchestration mode: <code class="language-plaintext highlighter-rouge">agentTasks</code> + optional <code class="language-plaintext highlighter-rouge">orchestrationType</code>, <code class="language-plaintext highlighter-rouge">coordinationStrategy</code></li>
+      <li>loop budgets:
+        <ul>
+          <li><code class="language-plaintext highlighter-rouge">maxIterations</code> (caps delegated task count)</li>
+          <li><code class="language-plaintext highlighter-rouge">maxDelegations</code> (hard cap for delegated agent task count)</li>
+          <li><code class="language-plaintext highlighter-rouge">maxLatencyMs</code> (overall orchestration timeout budget)</li>
+          <li><code class="language-plaintext highlighter-rouge">maxAgentLatencyMs</code> (per-delegated-agent timeout budget)</li>
+          <li><code class="language-plaintext highlighter-rouge">maxRetriesPerDelegation</code> (retry attempts for a failed delegated task)</li>
+        </ul>
+      </li>
+      <li><code class="language-plaintext highlighter-rouge">agentTasks[*].agentType</code> supports aliases:
+<code class="language-plaintext highlighter-rouge">planner-agent|agent-planner</code>, <code class="language-plaintext highlighter-rouge">coder-agent|agent-coder</code>,
+<code class="language-plaintext highlighter-rouge">analytics-agent|agent-analytic</code>, <code class="language-plaintext highlighter-rouge">evaluator-agent|agent-evaluator</code>,
+<code class="language-plaintext highlighter-rouge">common-agent|agent-basic</code></li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="planner--evaluator-payload-shape">Planner / Evaluator Payload Shape</h3>
+
+<p>Planner-oriented fragment:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"agent-planner"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"configuration"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"goal"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Design release checklist"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"strategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"PLAN_AND_EXECUTE"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"providerMode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"cloud"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"cloudProvider"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"providerId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tech.kayys/anthropic-provider"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"model"</span><span class="p">:</span><span class="w"> </span><span class="s2">"claude-3.5-sonnet"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Evaluator-oriented fragment:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"agent-evaluator"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"configuration"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"candidateOutput"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Implemented project execution API with tests"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"criteria"</span><span class="p">:</span><span class="w"> </span><span class="s2">"correctness, robustness, schema compliance"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"providerMode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"cloud"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"cloudProvider"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"providerId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tech.kayys/anthropic-provider"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"model"</span><span class="p">:</span><span class="w"> </span><span class="s2">"claude-3.5-sonnet"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Example execution payload fragment:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"spec"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"workflow"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"nodes"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"agent-1"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"agent-basic"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"configuration"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"providerMode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"cloud"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"cloudProvider"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+              </span><span class="nl">"providerId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tech.kayys/gemini-provider"</span><span class="p">,</span><span class="w">
+              </span><span class="nl">"model"</span><span class="p">:</span><span class="w"> </span><span class="s2">"gemini-2.0-flash"</span><span class="p">,</span><span class="w">
+              </span><span class="nl">"region"</span><span class="p">:</span><span class="w"> </span><span class="s2">"us-central1"</span><span class="w">
+            </span><span class="p">},</span><span class="w">
+            </span><span class="nl">"localProvider"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+              </span><span class="nl">"providerId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tech.kayys/ollama-provider"</span><span class="p">,</span><span class="w">
+              </span><span class="nl">"model"</span><span class="p">:</span><span class="w"> </span><span class="s2">"llama3.2"</span><span class="w">
+            </span><span class="p">},</span><span class="w">
+            </span><span class="nl">"credentialRefs"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+              </span><span class="p">{</span><span class="w">
+                </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"gemini-api-key"</span><span class="p">,</span><span class="w">
+                </span><span class="nl">"backend"</span><span class="p">:</span><span class="w"> </span><span class="s2">"vault"</span><span class="p">,</span><span class="w">
+                </span><span class="nl">"path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"wayang/providers/gemini"</span><span class="p">,</span><span class="w">
+                </span><span class="nl">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"apiKey"</span><span class="w">
+              </span><span class="p">}</span><span class="w">
+            </span><span class="p">],</span><span class="w">
+            </span><span class="nl">"vault"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+              </span><span class="nl">"backend"</span><span class="p">:</span><span class="w"> </span><span class="s2">"vault"</span><span class="p">,</span><span class="w">
+              </span><span class="nl">"tenantId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"community"</span><span class="p">,</span><span class="w">
+              </span><span class="nl">"pathPrefix"</span><span class="p">:</span><span class="w"> </span><span class="s2">"wayang/providers"</span><span class="w">
+            </span><span class="p">}</span><span class="w">
+          </span><span class="p">}</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">]</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="catalog-regression-coverage">Catalog Regression Coverage</h2>
+
+<p>Runtime includes <code class="language-plaintext highlighter-rouge">SchemaCatalogApiTest</code> to prevent regressions for:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">agent-planner</code> and <code class="language-plaintext highlighter-rouge">agent-evaluator</code> schema IDs exposed in <code class="language-plaintext highlighter-rouge">/v1/schema/catalog</code></li>
+  <li>typed fields in schema payloads:
+    <ul>
+      <li>planner: <code class="language-plaintext highlighter-rouge">goal</code>, <code class="language-plaintext highlighter-rouge">strategy</code></li>
+      <li>evaluator: <code class="language-plaintext highlighter-rouge">candidateOutput</code>, <code class="language-plaintext highlighter-rouge">criteria</code></li>
+    </ul>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">SchemaApiDynamicGenerationTest</code> also validates:
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">agent-orchestrator</code> schema exposes <code class="language-plaintext highlighter-rouge">goal</code>, <code class="language-plaintext highlighter-rouge">strategy</code>, <code class="language-plaintext highlighter-rouge">maxIterations</code>, <code class="language-plaintext highlighter-rouge">maxDelegations</code>, <code class="language-plaintext highlighter-rouge">maxLatencyMs</code>, <code class="language-plaintext highlighter-rouge">maxAgentLatencyMs</code>, <code class="language-plaintext highlighter-rouge">maxRetriesPerDelegation</code></li>
+      <li><code class="language-plaintext highlighter-rouge">agent-analytic</code> schema exposes <code class="language-plaintext highlighter-rouge">goal</code>, <code class="language-plaintext highlighter-rouge">criteria</code>, <code class="language-plaintext highlighter-rouge">preferredProvider</code></li>
+    </ul>
+  </li>
+</ul>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>Wayang AI Docs</span>
+      <a href="https://github.com/wayang-ai/wayang-platform">wayang-ai/wayang-platform</a>
+    </div>
+  </footer>
+</body>
+</html>

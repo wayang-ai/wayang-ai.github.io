@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guardrails API & Execution | Wayang AI</title>
+  <meta name="description" content="Wayang AI documentation and platform guides for building agentic workflows.">
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('wayang-theme');
+        var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        var theme = stored || (prefersLight ? 'light' : 'dark');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <div class="site-bg" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand">Wayang AI</a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="/docs/">Docs</a>
+        <a href="/docs/javadoc">Javadoc</a>
+        <a href="/features/">Features</a>
+        <a href="/about/">About</a>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme">Theme</button>
+        <a href="https://github.com/wayang-ai/wayang-platform">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container content-shell">
+    <h1 id="guardrails-api--execution">Guardrails API &amp; Execution</h1>
+
+<p>Wayang provides built-in mechanisms to govern and control Agent behaviors via <strong>Guardrails</strong>. The Guardrails ecosystem enforces rules continuously throughout the execution lifecycle of Wayang workflows and agents.</p>
+
+<h2 id="guardrails-management-api">Guardrails Management API</h2>
+
+<p>The Guardrails policy management is managed through a JSON REST API available in the <code class="language-plaintext highlighter-rouge">wayang-guardrails-core</code> component. This API lets you securely define what constraints exist on the execution of autonomous agents within the platform.</p>
+
+<h3 id="base-endpoint">Base Endpoint</h3>
+<p><code class="language-plaintext highlighter-rouge">http://localhost:31713/api/v1/guardrails/policies</code></p>
+
+<h3 id="supported-operations">Supported Operations</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Method</th>
+      <th>Path</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">GET</code></td>
+      <td><code class="language-plaintext highlighter-rouge">/api/v1/guardrails/policies</code></td>
+      <td>Retrieve all registered policies (tenant-isolated if <code class="language-plaintext highlighter-rouge">X-Tenant-Id</code> header provided)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">GET</code></td>
+      <td><code class="language-plaintext highlighter-rouge">/api/v1/guardrails/policies/{id}</code></td>
+      <td>Retrieve a specific policy by its ID</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">POST</code></td>
+      <td><code class="language-plaintext highlighter-rouge">/api/v1/guardrails/policies</code></td>
+      <td>Create and store a new policy</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">PUT</code></td>
+      <td><code class="language-plaintext highlighter-rouge">/api/v1/guardrails/policies/{id}</code></td>
+      <td>Update an existing policy</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">DELETE</code></td>
+      <td><code class="language-plaintext highlighter-rouge">/api/v1/guardrails/policies/{id}</code></td>
+      <td>Delete a policy by its ID</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="creating-a-policy">Creating a Policy</h3>
+
+<p>You can register a new policy by hitting the <code class="language-plaintext highlighter-rouge">POST</code> endpoint with the following payload structure. A policy defines which detectors are active for specific check phases.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-X</span> POST <span class="s2">"http://localhost:31713/api/v1/guardrails/policies"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span> <span class="se">\</span>
+  <span class="nt">-d</span> <span class="s1">'{
+    "id": "policy-01",
+    "name": "Strict Ethical Guidelines",
+    "description": "Blocks any toxic or PII-violating attempts before and after agent execution.",
+    "detectors": [
+      {
+        "id": "toxicity-detector",
+        "configuration": { "threshold": 0.8 },
+        "phases": ["PRE_EXECUTION", "POST_EXECUTION"]
+      },
+      {
+        "id": "pii-detector",
+        "phases": ["POST_EXECUTION"]
+      }
+    ],
+    "action": "BLOCK"
+  }'</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="agent-integration">Agent Integration</h2>
+
+<p>Wayang’s core agent executor is natively integrated with guardrails via the <code class="language-plaintext highlighter-rouge">GuardrailsService</code>.</p>
+
+<p>When a workflow runs an agent node (e.g., <code class="language-plaintext highlighter-rouge">AbstractAgentExecutor</code>), the execution flow strictly obeys these stages:</p>
+
+<ol>
+  <li><strong><code class="language-plaintext highlighter-rouge">beforeExecute</code></strong>: Executes platform-level setup before running the task.</li>
+  <li><strong><code class="language-plaintext highlighter-rouge">runGuardrailsPreCheck</code></strong> (Guardrails): Extracts context/prompt arguments passed to the agent and checks them against active policies using the registered Guardrails service.
+    <ul>
+      <li>If the pre-check validation fails (e.g., toxicity detected in standard prompts), the pipeline short-circuits.</li>
+      <li>The user will receive a <code class="language-plaintext highlighter-rouge">VALIDATION_ERROR</code> or <code class="language-plaintext highlighter-rouge">RUNTIME_ERROR</code> depending on the failure, detailing what triggered the Guardrail block.</li>
+    </ul>
+  </li>
+  <li><strong><code class="language-plaintext highlighter-rouge">doExecute</code></strong>: Run the actual AI logic (Planner, Coder, Evaluator, etc).</li>
+</ol>
+
+<h3 id="guardrail-executor-nodes">Guardrail Executor Nodes</h3>
+
+<p>Guardrails can also be embedded directly in your workflow as an independent node. Using <code class="language-plaintext highlighter-rouge">GuardrailNodeExecutor</code>, you can force content through validation mid-workflow without needing an agent execution. This enables validations outside the LLM contexts (e.g. validating scraped text, web payloads).</p>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>Wayang AI Docs</span>
+      <a href="https://github.com/wayang-ai/wayang-platform">wayang-ai/wayang-platform</a>
+    </div>
+  </footer>
+</body>
+</html>

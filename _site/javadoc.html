@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Javadoc API Reference | Wayang AI</title>
+  <meta name="description" content="Wayang AI documentation and platform guides for building agentic workflows.">
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('wayang-theme');
+        var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        var theme = stored || (prefersLight ? 'light' : 'dark');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <div class="site-bg" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand">Wayang AI</a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="/docs/">Docs</a>
+        <a href="/docs/javadoc">Javadoc</a>
+        <a href="/features/">Features</a>
+        <a href="/about/">About</a>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme">Theme</button>
+        <a href="https://github.com/wayang-ai/wayang-platform">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container content-shell">
+    <h1 id="javadoc-api-reference">Javadoc API Reference</h1>
+
+<p>Browse the complete Java API documentation for the Wayang AI Platform.</p>
+
+<h2 id="overview">Overview</h2>
+
+<p>The Javadoc documentation provides detailed API reference for all Wayang modules including:</p>
+
+<ul>
+  <li><strong>Core APIs</strong> - Project management, workflow definitions, and execution contracts</li>
+  <li><strong>Control Plane</strong> - Designer services, agent management, and audit logging</li>
+  <li><strong>Executors</strong> - Agent, EIP, embedding, guardrails, HITL, memory, RAG, and tool executors</li>
+  <li><strong>Schema &amp; Vault</strong> - Schema registry and secure credential management</li>
+  <li><strong>Plugin System</strong> - Plugin SPI and registry interfaces</li>
+</ul>
+
+<h2 id="accessing-the-javadoc">Accessing the Javadoc</h2>
+
+<p>The Javadoc is generated as part of the Maven build process and is available as static HTML files.</p>
+
+<h3 id="online-documentation">Online Documentation</h3>
+
+<p>Visit the <a href="./javadoc/index.html">Javadoc Reference</a> to browse the API documentation online.</p>
+
+<h3 id="generate-locally">Generate Locally</h3>
+
+<p>To generate the Javadoc locally:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd </span>wayang-platform/wayang
+mvn javadoc:aggregate-no-fork <span class="nt">-DskipTests</span> <span class="nt">-Dmaven</span>.test.skip<span class="o">=</span><span class="nb">true</span> <span class="nt">-Dcompiler</span>.skipMainCompilation<span class="o">=</span><span class="nb">true</span>
+</code></pre></div></div>
+
+<p>Or use the convenience script:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd </span>website/wayang.github.io/javadoc
+./generate-javadoc.sh
+</code></pre></div></div>
+
+<p>The generated Javadoc will be available in <code class="language-plaintext highlighter-rouge">website/wayang.github.io/javadoc/</code>.</p>
+
+<h2 id="key-packages">Key Packages</h2>
+
+<h3 id="core-modules">Core Modules</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Module</th>
+      <th>Package</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>wayang-project-api</td>
+      <td><code class="language-plaintext highlighter-rouge">tech.kayys.wayang.project.api</code></td>
+      <td>Project and workflow descriptors</td>
+    </tr>
+    <tr>
+      <td>wayang-api</td>
+      <td><code class="language-plaintext highlighter-rouge">tech.kayys.wayang.control.api</code></td>
+      <td>REST API resources</td>
+    </tr>
+    <tr>
+      <td>wayang-control-core</td>
+      <td><code class="language-plaintext highlighter-rouge">tech.kayys.wayang.control</code></td>
+      <td>Control plane services</td>
+    </tr>
+    <tr>
+      <td>wayang-schema-core</td>
+      <td><code class="language-plaintext highlighter-rouge">tech.kayys.wayang.schema</code></td>
+      <td>Schema registry and catalog</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="executors">Executors</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Module</th>
+      <th>Package</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>agent-executor</td>
+      <td><code class="language-plaintext highlighter-rouge">tech.kayys.wayang.executor.agent</code></td>
+      <td>Agent execution engine</td>
+    </tr>
+    <tr>
+      <td>eip-core</td>
+      <td><code class="language-plaintext highlighter-rouge">tech.kayys.wayang.eip</code></td>
+      <td>Enterprise integration patterns</td>
+    </tr>
+    <tr>
+      <td>guardrails-core</td>
+      <td><code class="language-plaintext highlighter-rouge">tech.kayys.wayang.guardrail</code></td>
+      <td>Input/output guardrails</td>
+    </tr>
+    <tr>
+      <td>hitl-core</td>
+      <td><code class="language-plaintext highlighter-rouge">tech.kayys.wayang.hitl</code></td>
+      <td>Human-in-the-loop execution</td>
+    </tr>
+    <tr>
+      <td>memory-core</td>
+      <td><code class="language-plaintext highlighter-rouge">tech.kayys.wayang.memory</code></td>
+      <td>Memory and context management</td>
+    </tr>
+    <tr>
+      <td>rag-core</td>
+      <td><code class="language-plaintext highlighter-rouge">tech.kayys.wayang.rag</code></td>
+      <td>Retrieval-augmented generation</td>
+    </tr>
+    <tr>
+      <td>tool-core</td>
+      <td><code class="language-plaintext highlighter-rouge">tech.kayys.wayang.tool</code></td>
+      <td>Tool execution and MCP</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+
+<p>Having issues generating or viewing the Javadoc? See the <a href="./docs/javadoc-troubleshooting">Javadoc Troubleshooting Guide</a> for solutions to common problems.</p>
+
+<h3 id="quick-fixes">Quick Fixes</h3>
+
+<p><strong>Compilation errors:</strong> Run <code class="language-plaintext highlighter-rouge">mvn clean install -DskipTests</code> first</p>
+
+<p><strong>OutOfMemoryError:</strong> Set <code class="language-plaintext highlighter-rouge">export MAVEN_OPTS="-Xmx4g"</code></p>
+
+<p><strong>404 in Jekyll:</strong> Run <code class="language-plaintext highlighter-rouge">bundle exec jekyll clean</code> and rebuild</p>
+
+<h2 id="related-documentation">Related Documentation</h2>
+
+<ul>
+  <li><a href="./projects-api">Projects API Guide</a></li>
+  <li><a href="./schema-catalog">Schema Catalog</a></li>
+  <li><a href="./agent-skills">Agent Skills</a></li>
+  <li><a href="./rag">RAG API</a></li>
+  <li><a href="./mcp">MCP Integration</a></li>
+  <li><a href="./docs/javadoc-troubleshooting">Javadoc Troubleshooting</a></li>
+</ul>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>Wayang AI Docs</span>
+      <a href="https://github.com/wayang-ai/wayang-platform">wayang-ai/wayang-platform</a>
+    </div>
+  </footer>
+</body>
+</html>

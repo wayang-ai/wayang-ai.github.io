@@ -15,6 +15,7 @@ Get started with Wayang AI and learn how to build powerful AI agent workflows.
 - **[Projects API](./projects-api)** - Project management and execution APIs
 - **[Schema Catalog](./schema-catalog)** - Schema registry and WayangSpec
 - **[SDK Gateway](./sdk-gateway)** - Gollek SDK Gateway & SPI
+- **[Wayang Assistant API](./wayang-assistant)** - Chat, project generation, and troubleshooting APIs
 
 ---
 

@@ -1,0 +1,62 @@
+#!/bin/bash
+# Generate Javadoc for Wayang AI Platform
+# Usage: ./generate-javadoc.sh
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# PROJECT_ROOT is 3 levels up from javadoc directory (wayang-platform)
+# Path: wayang-platform/website/wayang.github.io/javadoc
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+WAYANG_DIR="$PROJECT_ROOT/wayang"
+JAVADOC_OUTPUT="$SCRIPT_DIR"
+
+echo "==================================="
+echo "Wayang AI Platform - Javadoc Generator"
+echo "==================================="
+echo ""
+echo "Project Root: $PROJECT_ROOT"
+echo "Javadoc Output: $JAVADOC_OUTPUT"
+echo "Wayang Dir: $WAYANG_DIR"
+echo ""
+
+# Clean existing Javadoc (but keep this script and README)
+echo "Cleaning existing Javadoc..."
+find "$JAVADOC_OUTPUT" -mindepth 1 -maxdepth 1 ! -name '*.sh' ! -name 'README.md' ! -name '.gitignore' -exec rm -rf {} \;
+
+# Generate Javadoc
+echo "Generating Javadoc (this may take a few minutes)..."
+echo "Note: Skipping compilation, using source files directly..."
+echo "      Some modules may be skipped if they have compilation errors."
+echo ""
+cd "$WAYANG_DIR"
+
+# Use failOnError=false to continue even if some modules have errors
+mvn javadoc:aggregate-no-fork \
+    -DskipTests \
+    -Dmaven.test.skip=true \
+    -Dcompiler.skipMainCompilation=true \
+    -Dmaven.javadoc.failOnError=false \
+    -Dmaven.javadoc.failOnWarnings=false \
+    -q 2>&1 | grep -v "error:" | grep -v "warning:" | grep -v "^Command line was:" || true
+
+# Copy to correct location if needed
+if [ -d "$WAYANG_DIR/website/wayang.github.io/javadoc" ]; then
+    echo "Copying Javadoc to website directory..."
+    cp -r "$WAYANG_DIR/website/wayang.github.io/javadoc/"* "$JAVADOC_OUTPUT/"
+    rm -rf "$WAYANG_DIR/website"
+fi
+
+echo ""
+echo "==================================="
+echo "✓ Javadoc generation complete!"
+echo "==================================="
+echo ""
+echo "Note: Some modules may have been skipped due to compilation errors."
+echo "      Check the output above for details."
+echo ""
+echo "To view the Javadoc:"
+echo "  1. Open in browser: open $JAVADOC_OUTPUT/index.html"
+echo "  2. Or run Jekyll: cd .. && bundle exec jekyll serve"
+echo "  3. Navigate to: http://localhost:4000/docs/javadoc/index.html"
+echo ""

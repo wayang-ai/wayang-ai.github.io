@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trigger Integrations | Wayang AI</title>
+  <meta name="description" content="Wayang AI documentation and platform guides for building agentic workflows.">
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('wayang-theme');
+        var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        var theme = stored || (prefersLight ? 'light' : 'dark');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <div class="site-bg" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand">Wayang AI</a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="/docs/">Docs</a>
+        <a href="/docs/javadoc">Javadoc</a>
+        <a href="/features/">Features</a>
+        <a href="/about/">About</a>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme">Theme</button>
+        <a href="https://github.com/wayang-ai/wayang-platform">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container content-shell">
+    <h1 id="trigger-integrations">Trigger Integrations</h1>
+
+<p>Server-side trigger execution maps schema parameters into runtime output and integration behavior for:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">start</code></li>
+  <li><code class="language-plaintext highlighter-rouge">trigger-manual</code></li>
+  <li><code class="language-plaintext highlighter-rouge">trigger-schedule</code></li>
+  <li><code class="language-plaintext highlighter-rouge">trigger-email</code></li>
+  <li><code class="language-plaintext highlighter-rouge">trigger-telegram</code></li>
+  <li><code class="language-plaintext highlighter-rouge">trigger-websocket</code></li>
+  <li><code class="language-plaintext highlighter-rouge">trigger-webhook</code></li>
+  <li><code class="language-plaintext highlighter-rouge">trigger-event</code></li>
+  <li><code class="language-plaintext highlighter-rouge">trigger-kafka</code></li>
+  <li><code class="language-plaintext highlighter-rouge">trigger-file</code></li>
+</ul>
+
+<p>Each trigger node returns <code class="language-plaintext highlighter-rouge">triggerIntegration</code> in execution output.</p>
+
+<p>Example:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"triggerType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"trigger-email"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"triggeredAt"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-03-06T09:00:00Z"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"triggerIntegration"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"integrationMode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"simulated"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"liveRequested"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"liveEnabled"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"simulated"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"from"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ops@example.com"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"subjectContains"</span><span class="p">:</span><span class="w"> </span><span class="s2">"approval"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="live-vs-simulated-mode">Live vs Simulated Mode</h2>
+
+<p>Live integration and probe behavior are configurable:</p>
+
+<div class="language-properties highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="py">wayang.trigger.integration.live.enabled</span><span class="p">=</span><span class="s">false</span>
+<span class="py">wayang.trigger.integration.live.probe.enabled</span><span class="p">=</span><span class="s">false</span>
+<span class="py">wayang.trigger.integration.live.email.enabled</span><span class="p">=</span><span class="s">false</span>
+<span class="py">wayang.trigger.integration.live.telegram.enabled</span><span class="p">=</span><span class="s">false</span>
+<span class="py">wayang.trigger.integration.live.kafka.enabled</span><span class="p">=</span><span class="s">false</span>
+<span class="py">wayang.trigger.integration.live.file.enabled</span><span class="p">=</span><span class="s">true</span>
+</code></pre></div></div>
+
+<p>When live mode is disabled or unavailable, runtime falls back to <code class="language-plaintext highlighter-rouge">simulated</code> mode.</p>
+
+<h2 id="validation-and-coverage">Validation and Coverage</h2>
+
+<p>Automated tests cover:</p>
+
+<ul>
+  <li>all supported trigger types</li>
+  <li>schema parameter mapping into <code class="language-plaintext highlighter-rouge">triggerIntegration</code></li>
+  <li>live/simulated fallback behavior</li>
+  <li>probe and error-path handling</li>
+</ul>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>Wayang AI Docs</span>
+      <a href="https://github.com/wayang-ai/wayang-platform">wayang-ai/wayang-platform</a>
+    </div>
+  </footer>
+</body>
+</html>

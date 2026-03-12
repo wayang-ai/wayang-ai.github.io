@@ -14,13 +14,28 @@ Primary resource classes:
 - `tech.kayys.wayang.control.api.ProjectResource`
 - `tech.kayys.wayang.runtime.standalone.resource.ProjectExecutionsResource`
 
-Use this property to keep route registration unambiguous:
+## System Requirements
 
-```properties
-wayang.runtime.standalone.projects-resource.enabled=true
-```
+Wayang AI Platform now requires **JDK 25** and **Quarkus 3.32.2+**. 
+
+Key technical changes:
+- Native support for JDK 25 Foreign Function & Memory (FFM).
+- Hibernate Reactive support is standard in standalone runtime.
 
 ## Startup Troubleshooting
+
+### 0) SQL Reserved Keyword Conflict (`key`, `value`)
+
+**Symptom:**
+```text
+(JPA Startup Thread) GenerationTarget encountered exception: Syntax error in SQL statement "create table memory_metadata ([*]key varchar(255) ...
+```
+
+**Cause:**
+Legacy entities used the reserved keyword `key` as a column name, which is prohibited in modern H2 and PostgreSQL versions.
+
+**Fix:**
+All metadata tables have been standardized to use `metadata_key` and `metadata_value`. Ensure your `import.sql` or custom schema matches these column names.
 
 ### 1) `ClassNotFoundException` for `ControlPlane*Registry`
 

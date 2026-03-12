@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Testing Coverage | Wayang AI</title>
+  <meta name="description" content="Wayang AI documentation and platform guides for building agentic workflows.">
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('wayang-theme');
+        var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        var theme = stored || (prefersLight ? 'light' : 'dark');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <div class="site-bg" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand">Wayang AI</a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="/docs/">Docs</a>
+        <a href="/docs/javadoc">Javadoc</a>
+        <a href="/features/">Features</a>
+        <a href="/about/">About</a>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme">Theme</button>
+        <a href="https://github.com/wayang-ai/wayang-platform">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container content-shell">
+    <h1 id="runtime-testing-coverage">Runtime Testing Coverage</h1>
+
+<h2 id="trigger-and-hitl-coverage">Trigger and HITL Coverage</h2>
+
+<p>Automated coverage includes:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">TriggerSourceExecutorTest</code>
+    <ul>
+      <li>validates all supported trigger types</li>
+      <li>validates schema parameter mapping in output (<code class="language-plaintext highlighter-rouge">triggerIntegration</code>)</li>
+      <li>validates live/simulated behavior and probe handling</li>
+    </ul>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">BuiltinSchemaCatalogTriggerTest</code>
+    <ul>
+      <li>validates trigger schemas are present in catalog</li>
+      <li>validates required trigger parameter fields in schema definitions</li>
+    </ul>
+  </li>
+  <li>project execution integration tests
+    <ul>
+      <li>validates <code class="language-plaintext highlighter-rouge">POST /api/v1/projects/{projectId}/executions</code> end-to-end behavior with runtime spec payloads</li>
+      <li>validates dry-run path (<code class="language-plaintext highlighter-rouge">dryRun</code>/<code class="language-plaintext highlighter-rouge">validateOnly</code>) returns validation-only response and does not persist execution records</li>
+      <li>validates idempotent submit using <code class="language-plaintext highlighter-rouge">Idempotency-Key</code> replays existing execution and avoids duplicate runs</li>
+      <li>validates replay-window control (<code class="language-plaintext highlighter-rouge">idempotencyReplayWindowSeconds=0</code>) disables dedup replay and creates a new execution</li>
+      <li>validates request correlation (<code class="language-plaintext highlighter-rouge">X-Request-Id</code>) is echoed in execution response and present in timeline event metadata</li>
+      <li>validates stop reason taxonomy rejects unsupported reasons with <code class="language-plaintext highlighter-rouge">400 INVALID_STOP_REASON</code></li>
+      <li>validates lifecycle transition conflicts return standardized error payload (<code class="language-plaintext highlighter-rouge">errorCode</code>, <code class="language-plaintext highlighter-rouge">details</code>)</li>
+      <li>validates optimistic concurrency via <code class="language-plaintext highlighter-rouge">If-Match</code> returns <code class="language-plaintext highlighter-rouge">409 EXECUTION_VERSION_CONFLICT</code> on stale version</li>
+      <li>validates retryable conflicts include <code class="language-plaintext highlighter-rouge">Retry-After</code> header and <code class="language-plaintext highlighter-rouge">retryAfterSeconds</code> payload</li>
+      <li>validates execution submit rate limiting emits <code class="language-plaintext highlighter-rouge">X-RateLimit-*</code> headers and returns <code class="language-plaintext highlighter-rouge">429 EXECUTION_RATE_LIMITED</code> when exceeded</li>
+      <li>validates execution status returns <code class="language-plaintext highlighter-rouge">ETag</code> and supports conditional polling with <code class="language-plaintext highlighter-rouge">If-None-Match</code> (<code class="language-plaintext highlighter-rouge">304</code> when unchanged)</li>
+      <li>validates strict lifecycle transitions reject invalid <code class="language-plaintext highlighter-rouge">stop</code>/<code class="language-plaintext highlighter-rouge">resume</code> calls with <code class="language-plaintext highlighter-rouge">409 Conflict</code></li>
+      <li>validates execution lifecycle behavior used by HITL pause/resume flows</li>
+    </ul>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">StandaloneExecutionTimelineServiceTest</code>
+    <ul>
+      <li>validates node-completed timeline events include <code class="language-plaintext highlighter-rouge">metadata.telemetry</code> extracted from executor output</li>
+      <li>validates orchestrator metrics (<code class="language-plaintext highlighter-rouge">orchestrationType</code>, <code class="language-plaintext highlighter-rouge">tasksExecuted</code>, <code class="language-plaintext highlighter-rouge">budget</code>, <code class="language-plaintext highlighter-rouge">executorTelemetry</code>) are persisted for observability</li>
+    </ul>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">ProjectsResourceTelemetryTest</code>
+    <ul>
+      <li>validates <code class="language-plaintext highlighter-rouge">GET /api/v1/projects/{projectId}/executions/{executionId}/telemetry</code> aggregates timeline telemetry counters</li>
+      <li>validates latest budget snapshot and delegation counters are returned consistently</li>
+      <li>validates filtered windows, <code class="language-plaintext highlighter-rouge">groupBy=nodeId</code>, and <code class="language-plaintext highlighter-rouge">groupBy=type</code> with <code class="language-plaintext highlighter-rouge">sort</code>/<code class="language-plaintext highlighter-rouge">limit</code> rollups</li>
+      <li>validates <code class="language-plaintext highlighter-rouge">includeRaw=true</code> returns filtered raw event payload for debugging</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="agent-schema-coverage">Agent Schema Coverage</h2>
+
+<p>Automated coverage includes:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">SchemaCatalogApiTest</code>
+    <ul>
+      <li>validates <code class="language-plaintext highlighter-rouge">agent-planner</code> and <code class="language-plaintext highlighter-rouge">agent-evaluator</code> are exposed by <code class="language-plaintext highlighter-rouge">/v1/schema/catalog</code></li>
+      <li>validates typed schema fields are present in catalog payloads:
+        <ul>
+          <li>planner: <code class="language-plaintext highlighter-rouge">goal</code>, <code class="language-plaintext highlighter-rouge">strategy</code></li>
+          <li>evaluator: <code class="language-plaintext highlighter-rouge">candidateOutput</code>, <code class="language-plaintext highlighter-rouge">criteria</code></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">SchemaApiDynamicGenerationTest</code>
+    <ul>
+      <li>validates dynamic catalog schema exposure for:
+        <ul>
+          <li><code class="language-plaintext highlighter-rouge">agent-orchestrator</code> (<code class="language-plaintext highlighter-rouge">goal</code>, <code class="language-plaintext highlighter-rouge">strategy</code>, <code class="language-plaintext highlighter-rouge">maxIterations</code>, <code class="language-plaintext highlighter-rouge">maxDelegations</code>, <code class="language-plaintext highlighter-rouge">maxLatencyMs</code>, <code class="language-plaintext highlighter-rouge">maxAgentLatencyMs</code>, <code class="language-plaintext highlighter-rouge">maxRetriesPerDelegation</code>)</li>
+          <li><code class="language-plaintext highlighter-rouge">agent-analytic</code> (<code class="language-plaintext highlighter-rouge">goal</code>, <code class="language-plaintext highlighter-rouge">criteria</code>, <code class="language-plaintext highlighter-rouge">preferredProvider</code>)</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="agent-executor-coverage">Agent Executor Coverage</h2>
+
+<p>Automated unit coverage includes:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">BasicAgentExecutorTest</code>
+    <ul>
+      <li>validates <code class="language-plaintext highlighter-rouge">agent-basic</code> matching and successful execution path</li>
+    </ul>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">CoderAgentExecutorTest</code>
+    <ul>
+      <li>validates <code class="language-plaintext highlighter-rouge">agent-coder</code> typed execution (<code class="language-plaintext highlighter-rouge">instruction</code> / <code class="language-plaintext highlighter-rouge">taskType</code>) and output mapping</li>
+    </ul>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">AnalyticAgentExecutorTest</code>
+    <ul>
+      <li>validates <code class="language-plaintext highlighter-rouge">agent-analytic</code> typed execution (<code class="language-plaintext highlighter-rouge">question</code> / <code class="language-plaintext highlighter-rouge">taskType</code>) and output mapping</li>
+    </ul>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">PlannerAgentExecutorTest</code>
+    <ul>
+      <li>validates <code class="language-plaintext highlighter-rouge">agent-planner</code> typed execution and provider handling</li>
+    </ul>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">EvaluatorAgentExecutorTest</code>
+    <ul>
+      <li>validates <code class="language-plaintext highlighter-rouge">agent-evaluator</code> typed/fallback inputs (<code class="language-plaintext highlighter-rouge">candidateOutput</code>, <code class="language-plaintext highlighter-rouge">criteria</code>)</li>
+    </ul>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">OrchestratorAgentExecutorTest</code>
+    <ul>
+      <li>validates orchestration flows and agent delegation aliases</li>
+      <li>validates loop budget controls (<code class="language-plaintext highlighter-rouge">maxIterations</code>, <code class="language-plaintext highlighter-rouge">maxDelegations</code>, <code class="language-plaintext highlighter-rouge">maxLatencyMs</code>, <code class="language-plaintext highlighter-rouge">maxAgentLatencyMs</code>, <code class="language-plaintext highlighter-rouge">maxRetriesPerDelegation</code>, invalid budget input handling)</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="mcp-coverage">MCP Coverage</h2>
+
+<p>See dedicated MCP test details in <a href="./mcp">MCP API Coverage</a>.</p>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>Wayang AI Docs</span>
+      <a href="https://github.com/wayang-ai/wayang-platform">wayang-ai/wayang-platform</a>
+    </div>
+  </footer>
+</body>
+</html>

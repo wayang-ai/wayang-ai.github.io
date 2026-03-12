@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wayang Kulit User Guide | Wayang AI</title>
+  <meta name="description" content="Wayang AI documentation and platform guides for building agentic workflows.">
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('wayang-theme');
+        var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        var theme = stored || (prefersLight ? 'light' : 'dark');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <div class="site-bg" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand">Wayang AI</a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="/docs/">Docs</a>
+        <a href="/docs/javadoc">Javadoc</a>
+        <a href="/features/">Features</a>
+        <a href="/about/">About</a>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme">Theme</button>
+        <a href="https://github.com/wayang-ai/wayang-platform">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container content-shell">
+    <h1 id="wayang-kulit-user-guide">Wayang Kulit User Guide</h1>
+
+<p>This guide covers daily usage of the Wayang Kulit desktop app, including local/cloud project handling, workflow execution, failure debugging, and logs.</p>
+
+<hr />
+
+<h2 id="whats-new-in-designer">What’s New in Designer</h2>
+
+<p>Recent desktop improvements:</p>
+
+<ul>
+  <li>persistent sign-in/session behavior</li>
+  <li>execute flow with request correlation and idempotent submit</li>
+  <li>execute fallback alias support (<code class="language-plaintext highlighter-rouge">/execute-spec</code>)</li>
+  <li>retry execution from details dialog</li>
+  <li>automatic startup failure handling with optional auto-open details</li>
+  <li>pinned failed node with canvas highlight and quick focus/clear</li>
+  <li>keyboard shortcuts for failed node focus (<code class="language-plaintext highlighter-rouge">F</code>) and clear (<code class="language-plaintext highlighter-rouge">Shift+F</code>)</li>
+  <li>conditional status/events polling with ETag (<code class="language-plaintext highlighter-rouge">304 Not Modified</code>)</li>
+  <li>enhanced logs viewer with selectable/copyable content</li>
+</ul>
+
+<p>See full changelog:</p>
+
+<ul>
+  <li><a href="./designer-release-notes">Wayang Kulit Release Notes</a></li>
+</ul>
+
+<hr />
+
+<h2 id="1-start-and-createopen-a-project">1. Start and Create/Open a Project</h2>
+
+<p>When the app launches, Quick Start can show:</p>
+
+<ul>
+  <li><strong>Start Blank</strong></li>
+  <li><strong>Open Local File</strong> (<code class="language-plaintext highlighter-rouge">.wayang</code> / <code class="language-plaintext highlighter-rouge">.json</code>)</li>
+  <li><strong>Pick Template</strong></li>
+</ul>
+
+<p>You can toggle this in <strong>Settings</strong> with <strong>Show Quick Start on Launch</strong>.</p>
+
+<hr />
+
+<h2 id="2-save-and-open-projects">2. Save and Open Projects</h2>
+
+<p>Use the <strong>Storage</strong> menu in the top bar:</p>
+
+<ul>
+  <li><strong>Save Local</strong>: save current project to file (<code class="language-plaintext highlighter-rouge">.wayang</code> recommended)</li>
+  <li><strong>Open Local</strong>: load project from local file</li>
+  <li><strong>Save</strong>: save to current cloud project on local control server</li>
+  <li><strong>Save As</strong>: create/select another cloud project and save there</li>
+  <li><strong>Open Cloud</strong>: pick a project from server list</li>
+</ul>
+
+<p>If cloud API is unavailable, Designer keeps local fallback cache for demo/standalone flow.</p>
+
+<hr />
+
+<h2 id="3-execute-workflow">3. Execute Workflow</h2>
+
+<p>Use <strong>Runtime -&gt; Execute Workflow</strong>.</p>
+
+<p>Execution flow:</p>
+
+<ol>
+  <li>Ensure cloud project is active (Designer prompts to save first if needed).</li>
+  <li>Provide execution name, description, and optional JSON <code class="language-plaintext highlighter-rouge">inputs</code>.</li>
+  <li>Designer submits current route as <code class="language-plaintext highlighter-rouge">spec</code> (<code class="language-plaintext highlighter-rouge">WayangSpec</code>) to:
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">POST /api/v1/projects/{projectId}/executions</code></li>
+      <li>fallback alias: <code class="language-plaintext highlighter-rouge">POST /api/v1/projects/{projectId}/execute-spec</code></li>
+    </ul>
+  </li>
+</ol>
+
+<p>Designer sends:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">X-Request-Id</code> for request correlation</li>
+  <li><code class="language-plaintext highlighter-rouge">Idempotency-Key</code> for safe retries/dedup</li>
+  <li><code class="language-plaintext highlighter-rouge">idempotencyReplayWindowSeconds</code> in payload</li>
+</ul>
+
+<p>If enabled in <strong>Settings</strong>, <strong>Auto Dry Run Before Execute</strong> shows a validation/spec preview before submit.</p>
+
+<hr />
+
+<h2 id="4-monitor-executions">4. Monitor Executions</h2>
+
+<p>From <strong>Runtime -&gt; Execution History</strong>:</p>
+
+<ul>
+  <li>refresh status</li>
+  <li>stop/resume execution</li>
+  <li>delete execution record</li>
+  <li>open details</li>
+</ul>
+
+<p>Execution lifecycle actions support optimistic concurrency where version token is available:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">If-Match</code> header</li>
+  <li><code class="language-plaintext highlighter-rouge">expectedVersion</code> body field (for stop/resume)</li>
+</ul>
+
+<p><code class="language-plaintext highlighter-rouge">409</code> version conflict means refresh and retry.</p>
+
+<hr />
+
+<h2 id="5-execution-details-and-timeline">5. Execution Details and Timeline</h2>
+
+<p>Execution details dialog includes:</p>
+
+<ul>
+  <li>live status polling</li>
+  <li>timeline event filter/search</li>
+  <li>jump-to-node from event</li>
+  <li>export timeline JSON/CSV</li>
+  <li>copy visible timeline JSON</li>
+  <li>retry execution</li>
+</ul>
+
+<p>Polling uses conditional fetch when server provides ETag:</p>
+
+<ul>
+  <li>status endpoint: <code class="language-plaintext highlighter-rouge">If-None-Match</code> + <code class="language-plaintext highlighter-rouge">304 Not Modified</code></li>
+  <li>events endpoint: <code class="language-plaintext highlighter-rouge">If-None-Match</code> + <code class="language-plaintext highlighter-rouge">304 Not Modified</code></li>
+</ul>
+
+<p>Events payload shapes supported by Designer:</p>
+
+<ul>
+  <li>direct list: <code class="language-plaintext highlighter-rouge">[...]</code></li>
+  <li>wrapped object: <code class="language-plaintext highlighter-rouge">{ "events": [...] }</code></li>
+</ul>
+
+<hr />
+
+<h2 id="6-failure-debugging-pinned-failed-node">6. Failure Debugging (Pinned Failed Node)</h2>
+
+<p>When timeline contains a failing event with <code class="language-plaintext highlighter-rouge">nodeId</code>, Designer pins that node as latest failed node.</p>
+
+<p>Features:</p>
+
+<ul>
+  <li>auto-focus failed node (configurable in Settings)</li>
+  <li>app bar chip: <strong>Failed: …</strong> to focus quickly</li>
+  <li>clear pinned failed node from app bar or details dialog</li>
+  <li>node is highlighted on canvas until cleared</li>
+</ul>
+
+<p>Shortcuts:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">F</code>: focus pinned failed node</li>
+  <li><code class="language-plaintext highlighter-rouge">Shift+F</code>: clear pinned failed node</li>
+</ul>
+
+<hr />
+
+<h2 id="7-logs">7. Logs</h2>
+
+<p>Open <strong>View Logs</strong> from top bar.</p>
+
+<p>Designer logs:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>~/.wayang/logs/designer/
+</code></pre></div></div>
+
+<p>Server logs:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>~/.wayang/logs/server/
+</code></pre></div></div>
+
+<p>Viewer supports:</p>
+
+<ul>
+  <li>log source switch (designer/server)</li>
+  <li>file list and content view</li>
+  <li>raw text and JSON-friendly viewing</li>
+  <li>copy text/content</li>
+  <li>selectable text</li>
+</ul>
+
+<hr />
+
+<h2 id="8-recommended-settings">8. Recommended Settings</h2>
+
+<p>For standalone desktop usage:</p>
+
+<ul>
+  <li>enable <strong>Auto Dry Run Before Execute</strong></li>
+  <li>enable <strong>Auto Focus Failed Node</strong></li>
+  <li>enable <strong>Auto-open Failure Details</strong></li>
+  <li>enable <strong>Auto Reveal Exported Files</strong> (optional)</li>
+</ul>
+
+<hr />
+
+<h2 id="9-upgrade-checklist">9. Upgrade Checklist</h2>
+
+<p>Use this checklist after updating Designer:</p>
+
+<ol>
+  <li>Open <strong>Settings</strong> and verify:
+    <ul>
+      <li><strong>Auto Dry Run Before Execute</strong></li>
+      <li><strong>Auto Focus Failed Node</strong></li>
+      <li><strong>Auto-open Failure Details</strong></li>
+    </ul>
+  </li>
+  <li>Run one test execution and confirm:
+    <ul>
+      <li>execution starts from <strong>Runtime -&gt; Execute Workflow</strong></li>
+      <li>request/submit feedback appears in snackbar/logs</li>
+    </ul>
+  </li>
+  <li>Open <strong>Execution History</strong> and validate lifecycle actions:
+    <ul>
+      <li>stop/resume/delete work as expected</li>
+      <li>if <code class="language-plaintext highlighter-rouge">409</code> appears, refresh and retry (version conflict handling)</li>
+    </ul>
+  </li>
+  <li>Open execution details and check:
+    <ul>
+      <li>timeline polling updates</li>
+      <li>jump-to-node works from events</li>
+      <li>retry execution works</li>
+    </ul>
+  </li>
+  <li>Trigger a controlled failure and verify:
+    <ul>
+      <li>failed node is pinned/highlighted</li>
+      <li>app bar <strong>Failed: …</strong> focus/clear works</li>
+      <li>shortcuts <code class="language-plaintext highlighter-rouge">F</code> and <code class="language-plaintext highlighter-rouge">Shift+F</code> work</li>
+    </ul>
+  </li>
+  <li>Validate storage paths and logs:
+    <ul>
+      <li>Designer logs at <code class="language-plaintext highlighter-rouge">~/.wayang/logs/designer/</code></li>
+      <li>Server logs at <code class="language-plaintext highlighter-rouge">~/.wayang/logs/server/</code></li>
+    </ul>
+  </li>
+  <li>If using local control API, verify execution endpoint compatibility:
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">/api/v1/projects/{projectId}/executions</code></li>
+      <li>fallback <code class="language-plaintext highlighter-rouge">/api/v1/projects/{projectId}/execute-spec</code></li>
+    </ul>
+  </li>
+</ol>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>Wayang AI Docs</span>
+      <a href="https://github.com/wayang-ai/wayang-platform">wayang-ai/wayang-platform</a>
+    </div>
+  </footer>
+</body>
+</html>

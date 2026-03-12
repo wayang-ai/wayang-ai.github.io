@@ -77,10 +77,13 @@ wayang.embedding.model=Qwen/Qwen2.5-0.5B-Instruct
 
 ## Built-In Vector Stores
 
-Wayang AI natively supports **FAISS** out-of-the-box as its default vector search backend, utilizing the JDK 25 Foreign Function & Memory (FFM) API for maximum performance without external dependencies. 
+Wayang AI natively supports **FAISS** out-of-the-box as its default vector search backend. 
+
+> [!IMPORTANT]
+> When running on **JDK 25**, Wayang utilizes the **Foreign Function & Memory (FFM) API** to interop with the native FAISS library. This provides maximum performance with zero-copy memory access, enabling ultra-fast semantic search for RAG and autonomous agents with no external database dependencies.
 
 Other supported vector stores:
-- **FAISS** (default): High-performance C++ backend.
+- **FAISS** (default): High-performance C++ backend via FFM.
 - **In-Memory**: Standard Java-based exact vector search (dev/testing).
 - **PGVector**: PostgreSQL extension for production workloads.
 - **Pinecone**, **Chroma**, **Qdrant**, **Milvus**: Supported via standard configuration options.

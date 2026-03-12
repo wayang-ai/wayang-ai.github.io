@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HITL Flow | Wayang AI</title>
+  <meta name="description" content="Wayang AI documentation and platform guides for building agentic workflows.">
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('wayang-theme');
+        var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        var theme = stored || (prefersLight ? 'light' : 'dark');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <div class="site-bg" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand">Wayang AI</a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="/docs/">Docs</a>
+        <a href="/docs/javadoc">Javadoc</a>
+        <a href="/features/">Features</a>
+        <a href="/about/">About</a>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme">Theme</button>
+        <a href="https://github.com/wayang-ai/wayang-platform">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container content-shell">
+    <h1 id="hitl-execution-flow">HITL Execution Flow</h1>
+
+<p><code class="language-plaintext highlighter-rouge">hitl-human-task</code> provides a manual checkpoint in workflow execution.</p>
+
+<h2 id="runtime-lifecycle">Runtime Lifecycle</h2>
+
+<ol>
+  <li>Workflow executes until a HITL node.</li>
+  <li>Execution transitions to waiting/paused.</li>
+  <li>Client submits human decision/data using resume endpoint.</li>
+  <li>Execution continues from checkpoint.</li>
+</ol>
+
+<p>Resume request:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-X</span> POST <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/executions/{executionId}/resume"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span> <span class="se">\</span>
+  <span class="nt">-d</span> <span class="s1">'{
+    "humanTaskId": "task_123",
+    "data": {
+      "approved": true,
+      "comment": "continue execution"
+    }
+  }'</span>
+</code></pre></div></div>
+
+<h2 id="designer-support">Designer Support</h2>
+
+<p>In Wayang Kulit, you can insert a checkpoint with:</p>
+
+<ul>
+  <li>right-click a node</li>
+  <li>choose <code class="language-plaintext highlighter-rouge">Insert HITL Checkpoint</code></li>
+</ul>
+
+<p>This inserts a <code class="language-plaintext highlighter-rouge">hitl-human-task</code> node and rewires outgoing edges through the checkpoint.</p>
+
+<h2 id="execution-events-and-persistence">Execution Events and Persistence</h2>
+
+<p>Execution metadata:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>~/.wayang/logs/server/cloud-project-executions.json
+</code></pre></div></div>
+
+<p>Execution event timeline:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>~/.wayang/logs/server/cloud-project-execution-events.json
+</code></pre></div></div>
+
+<h2 id="test-coverage">Test Coverage</h2>
+
+<p>Coverage includes:</p>
+
+<ul>
+  <li>project execution lifecycle behavior used by HITL pause/resume</li>
+  <li>integration tests for execution API flow around waiting/resume semantics</li>
+</ul>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>Wayang AI Docs</span>
+      <a href="https://github.com/wayang-ai/wayang-platform">wayang-ai/wayang-platform</a>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Projects API | Wayang AI</title>
+  <meta name="description" content="Wayang AI documentation and platform guides for building agentic workflows.">
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('wayang-theme');
+        var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        var theme = stored || (prefersLight ? 'light' : 'dark');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <div class="site-bg" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand">Wayang AI</a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="/docs/">Docs</a>
+        <a href="/docs/javadoc">Javadoc</a>
+        <a href="/features/">Features</a>
+        <a href="/about/">About</a>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme">Theme</button>
+        <a href="https://github.com/wayang-ai/wayang-platform">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container content-shell">
+    <h1 id="projects-api">Projects API</h1>
+
+<p>Base path:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">/api/v1/projects</code></li>
+</ul>
+
+<p>Implementation modules:</p>
+
+<ul>
+  <li>Core API resources and supports live in <code class="language-plaintext highlighter-rouge">wayang/core/wayang-api</code>.</li>
+  <li>Standalone runtime (<code class="language-plaintext highlighter-rouge">wayang/runtime/wayang-runtime-standalone</code>) depends on <code class="language-plaintext highlighter-rouge">wayang-api</code> and provides runtime wiring/configuration.</li>
+</ul>
+
+<p>Identity headers used by standalone runtime:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">X-Tenant-Id</code> (defaults to <code class="language-plaintext highlighter-rouge">community</code> when omitted)</li>
+  <li><code class="language-plaintext highlighter-rouge">X-User-Id</code> (recommended for access/consent evaluation)</li>
+</ul>
+
+<h2 id="core-endpoints">Core Endpoints</h2>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">GET /api/v1/projects</code></li>
+  <li><code class="language-plaintext highlighter-rouge">GET /api/v1/projects/shareable?mode=callable</code></li>
+  <li><code class="language-plaintext highlighter-rouge">POST /api/v1/projects</code></li>
+  <li><code class="language-plaintext highlighter-rouge">GET /api/v1/projects/{projectId}</code></li>
+  <li><code class="language-plaintext highlighter-rouge">GET /api/v1/projects/{projectId}/callable-contract</code></li>
+  <li><code class="language-plaintext highlighter-rouge">POST /api/v1/projects/{projectId}/validate-callable</code></li>
+  <li><code class="language-plaintext highlighter-rouge">POST /api/v1/projects/{projectId}/preview-output-bindings</code></li>
+  <li><code class="language-plaintext highlighter-rouge">PUT /api/v1/projects/{projectId}</code></li>
+  <li><code class="language-plaintext highlighter-rouge">DELETE /api/v1/projects/{projectId}</code></li>
+</ul>
+
+<p>Execution endpoints:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">POST /api/v1/projects/{projectId}/executions</code></li>
+  <li><code class="language-plaintext highlighter-rouge">POST /api/v1/projects/{projectId}/execute-spec</code> (alias)</li>
+  <li><code class="language-plaintext highlighter-rouge">GET /api/v1/projects/{projectId}/executions</code></li>
+  <li><code class="language-plaintext highlighter-rouge">GET /api/v1/projects/{projectId}/executions/{executionId}</code></li>
+  <li><code class="language-plaintext highlighter-rouge">GET /api/v1/projects/{projectId}/executions/{executionId}/events</code></li>
+  <li><code class="language-plaintext highlighter-rouge">GET /api/v1/projects/{projectId}/executions/{executionId}/telemetry</code></li>
+  <li><code class="language-plaintext highlighter-rouge">GET /api/v1/projects/{projectId}/executions/{executionId}/lineage</code></li>
+  <li><code class="language-plaintext highlighter-rouge">POST /api/v1/projects/{projectId}/executions/{executionId}/stop</code></li>
+  <li><code class="language-plaintext highlighter-rouge">POST /api/v1/projects/{projectId}/executions/{executionId}/resume</code></li>
+  <li><code class="language-plaintext highlighter-rouge">DELETE /api/v1/projects/{projectId}/executions/{executionId}</code></li>
+</ul>
+
+<p>Debugger endpoints (standalone):</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">GET /api/v1/debug/projects/{projectId}/executions/{executionId}/events</code></li>
+  <li><code class="language-plaintext highlighter-rouge">GET /api/v1/debug/projects/{projectId}/executions/{executionId}/telemetry</code></li>
+  <li><code class="language-plaintext highlighter-rouge">GET /api/v1/debug/projects/{projectId}/executions/{executionId}/lineage</code></li>
+  <li><code class="language-plaintext highlighter-rouge">GET /api/v1/debug/projects/{projectId}/executions/{executionId}/snapshot</code></li>
+</ul>
+
+<h2 id="create-project">Create Project</h2>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-X</span> POST <span class="s2">"http://localhost:31713/api/v1/projects"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"X-Tenant-Id: tenant-a"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"X-User-Id: alice"</span> <span class="se">\</span>
+  <span class="nt">-d</span> <span class="s1">'{
+    "name": "parent-project",
+    "metadata": { "createdBy": "alice" },
+    "spec": {
+      "specVersion": "1.0.0",
+      "workflow": { "nodes": [], "connections": [] }
+    }
+  }'</span>
+</code></pre></div></div>
+
+<h2 id="execute-project-spec">Execute Project Spec</h2>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-X</span> POST <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/executions"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"X-Tenant-Id: tenant-a"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"X-User-Id: alice"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"Idempotency-Key: req-001"</span> <span class="se">\</span>
+  <span class="nt">-d</span> <span class="s1">'{
+    "name": "run-1",
+    "dryRun": false,
+    "parentExecutionId": "parent-exec-001",
+    "parentProjectId": "parent-project-001",
+    "parentNodeId": "custom-agent-node-1",
+    "relationType": "subworkflow",
+    "correlationId": "corr-123",
+    "maxSubWorkflowDepth": 2,
+    "spec": {
+      "specVersion": "1.0.0",
+      "workflow": { "nodes": [], "connections": [] }
+    }
+  }'</span>
+</code></pre></div></div>
+
+<p>Notes:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">dryRun: true</code> (or <code class="language-plaintext highlighter-rouge">validateOnly: true</code>) validates only and does not run workflow.</li>
+  <li>request accepts <code class="language-plaintext highlighter-rouge">spec</code>, <code class="language-plaintext highlighter-rouge">wayangSpec</code>, or <code class="language-plaintext highlighter-rouge">workflowSpec</code>.</li>
+  <li>optional execution-correlation fields:
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">parentExecutionId</code></li>
+      <li><code class="language-plaintext highlighter-rouge">parentProjectId</code></li>
+      <li><code class="language-plaintext highlighter-rouge">parentNodeId</code></li>
+      <li><code class="language-plaintext highlighter-rouge">relationType</code> (for example: <code class="language-plaintext highlighter-rouge">subworkflow</code>)</li>
+      <li><code class="language-plaintext highlighter-rouge">correlationId</code></li>
+    </ul>
+  </li>
+  <li>if provided, runtime stores <code class="language-plaintext highlighter-rouge">executionContext</code> and exposes it in:
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">POST /executions</code> accepted response</li>
+      <li><code class="language-plaintext highlighter-rouge">GET /executions/{executionId}</code> status response</li>
+      <li><code class="language-plaintext highlighter-rouge">GET /executions/{executionId}/events</code> metadata</li>
+      <li><code class="language-plaintext highlighter-rouge">GET /executions/{executionId}/telemetry</code></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="sub-workflow-reference-custom-agent-node">Sub-Workflow Reference (Custom Agent Node)</h2>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"metadata"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"custom-reusable-1"</span><span class="w"> </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"custom-agent-node"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"configuration"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"projectId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"{childProjectId}"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Runtime resolves <code class="language-plaintext highlighter-rouge">projectId</code> at execution time (reference-only contract).</p>
+
+<p>Shareable picker endpoint (for custom agent selection in UI):</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"X-Tenant-Id: tenant-b"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"X-User-Id: bob"</span> <span class="se">\</span>
+  <span class="s2">"http://localhost:31713/api/v1/projects/shareable?mode=callable"</span>
+</code></pre></div></div>
+
+<p>Response includes callable contract metadata for UI mapping:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">callable.mode</code>: <code class="language-plaintext highlighter-rouge">callable</code> or <code class="language-plaintext highlighter-rouge">autonomous</code></li>
+  <li>
+    <table>
+      <tbody>
+        <tr>
+          <td><code class="language-plaintext highlighter-rouge">callable.entrypoint.type</code>: <code class="language-plaintext highlighter-rouge">manual</code></td>
+          <td><code class="language-plaintext highlighter-rouge">parameterized</code></td>
+          <td><code class="language-plaintext highlighter-rouge">empty</code></td>
+          <td><code class="language-plaintext highlighter-rouge">trigger</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">callable.version</code>: child contract version/snapshot marker</li>
+  <li><code class="language-plaintext highlighter-rouge">callable.inputs.required[]</code> / <code class="language-plaintext highlighter-rouge">callable.inputs.optional[]</code></li>
+  <li><code class="language-plaintext highlighter-rouge">callable.output</code> (if declared)</li>
+</ul>
+
+<p>When execution or dry-run expands sub-workflow nodes, response includes:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">subWorkflowResolution.childReferences</code></li>
+  <li><code class="language-plaintext highlighter-rouge">subWorkflowResolution.childrenResolved</code></li>
+  <li><code class="language-plaintext highlighter-rouge">subWorkflowResolution.trace[]</code> with:
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">childId</code>, <code class="language-plaintext highlighter-rouge">projectId</code>, <code class="language-plaintext highlighter-rouge">depth</code></li>
+      <li><code class="language-plaintext highlighter-rouge">parentNodeId</code>, <code class="language-plaintext highlighter-rouge">parentProjectId</code></li>
+      <li><code class="language-plaintext highlighter-rouge">callableMode</code>, <code class="language-plaintext highlighter-rouge">entrypointType</code>, <code class="language-plaintext highlighter-rouge">version</code></li>
+      <li><code class="language-plaintext highlighter-rouge">bindingSummary</code>:
+        <ul>
+          <li><code class="language-plaintext highlighter-rouge">inputKeys</code>, <code class="language-plaintext highlighter-rouge">inputCount</code></li>
+          <li><code class="language-plaintext highlighter-rouge">outputBindingSources</code>, <code class="language-plaintext highlighter-rouge">outputBindingTargets</code>, <code class="language-plaintext highlighter-rouge">outputBindingCount</code></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<p>Lineage-focused endpoint for UI:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/executions/{executionId}/lineage?view=compact&amp;nodeId=custom-agent-1&amp;sort=depth:desc&amp;limit=20&amp;offset=0&amp;fields=childId,parentNodeId,depth&amp;include=executionContext,status"</span>
+</code></pre></div></div>
+
+<p>Response includes:</p>
+
+<ul>
+  <li>
+    <table>
+      <tbody>
+        <tr>
+          <td><code class="language-plaintext highlighter-rouge">view</code>: <code class="language-plaintext highlighter-rouge">full</code></td>
+          <td><code class="language-plaintext highlighter-rouge">compact</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">nodeId</code>: filter applied to <code class="language-plaintext highlighter-rouge">trace[]</code> using <code class="language-plaintext highlighter-rouge">parentNodeId</code> or <code class="language-plaintext highlighter-rouge">childId</code></li>
+  <li><code class="language-plaintext highlighter-rouge">sort</code>: e.g. <code class="language-plaintext highlighter-rouge">depth:desc</code>, <code class="language-plaintext highlighter-rouge">childId:asc</code>, <code class="language-plaintext highlighter-rouge">parentNodeId:asc</code></li>
+  <li><code class="language-plaintext highlighter-rouge">limit</code>, <code class="language-plaintext highlighter-rouge">offset</code></li>
+  <li><code class="language-plaintext highlighter-rouge">fields</code>: accepted trace projection keys after allowlist filtering</li>
+  <li><code class="language-plaintext highlighter-rouge">ignoredFields</code>: requested projection keys that are not supported and were ignored</li>
+  <li><code class="language-plaintext highlighter-rouge">include</code>: accepted top-level sections after allowlist filtering</li>
+  <li><code class="language-plaintext highlighter-rouge">ignoredIncludes</code>: requested top-level sections that are not supported and were ignored</li>
+  <li><code class="language-plaintext highlighter-rouge">traceCount</code></li>
+  <li><code class="language-plaintext highlighter-rouge">totalTraceCount</code> (before filter)</li>
+  <li><code class="language-plaintext highlighter-rouge">filteredTraceCount</code> (after filter, before pagination)</li>
+  <li><code class="language-plaintext highlighter-rouge">trace[]</code> (lineage + binding summary)</li>
+  <li><code class="language-plaintext highlighter-rouge">subWorkflowResolution</code> (included by default in <code class="language-plaintext highlighter-rouge">view=full</code>)</li>
+  <li><code class="language-plaintext highlighter-rouge">executionContext</code> (included by default in both <code class="language-plaintext highlighter-rouge">full</code> and <code class="language-plaintext highlighter-rouge">compact</code>)</li>
+  <li><code class="language-plaintext highlighter-rouge">status</code>, <code class="language-plaintext highlighter-rouge">updatedAt</code> (included by default in <code class="language-plaintext highlighter-rouge">view=full</code>)</li>
+</ul>
+
+<p>Accepted <code class="language-plaintext highlighter-rouge">fields</code> and <code class="language-plaintext highlighter-rouge">include</code> values are returned in server-defined canonical order, not request order.</p>
+
+<p>Supported <code class="language-plaintext highlighter-rouge">fields</code> keys for <code class="language-plaintext highlighter-rouge">trace[]</code> projection:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">projectId</code></li>
+  <li><code class="language-plaintext highlighter-rouge">childProjectId</code></li>
+  <li><code class="language-plaintext highlighter-rouge">childId</code></li>
+  <li><code class="language-plaintext highlighter-rouge">parentNodeId</code></li>
+  <li><code class="language-plaintext highlighter-rouge">parentProjectId</code></li>
+  <li><code class="language-plaintext highlighter-rouge">depth</code></li>
+  <li><code class="language-plaintext highlighter-rouge">invokeMode</code></li>
+  <li><code class="language-plaintext highlighter-rouge">waitForCompletion</code></li>
+  <li><code class="language-plaintext highlighter-rouge">bindingSummary</code></li>
+</ul>
+
+<p>Supported <code class="language-plaintext highlighter-rouge">include</code> keys for top-level lineage projection:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">executionContext</code></li>
+  <li><code class="language-plaintext highlighter-rouge">subWorkflowResolution</code></li>
+  <li><code class="language-plaintext highlighter-rouge">status</code></li>
+  <li><code class="language-plaintext highlighter-rouge">updatedAt</code></li>
+</ul>
+
+<p>Direct contract endpoint:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"X-Tenant-Id: tenant-b"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"X-User-Id: bob"</span> <span class="se">\</span>
+  <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/callable-contract"</span>
+</code></pre></div></div>
+
+<p>Contract validation endpoint (preflight for node configuration):</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-X</span> POST <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/validate-callable"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"X-Tenant-Id: tenant-b"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"X-User-Id: bob"</span> <span class="se">\</span>
+  <span class="nt">-d</span> <span class="s1">'{
+    "nodeId": "custom-agent-1",
+    "configuration": {
+      "projectId": "{projectId}",
+      "projectVersion": "v2",
+      "inputs": {
+        "ticketId": "INC-123"
+      },
+      "outputBindings": {
+        "summary": "context.child.summary"
+      }
+    }
+  }'</span>
+</code></pre></div></div>
+
+<p>Output mapping preview endpoint:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-X</span> POST <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/preview-output-bindings"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"X-Tenant-Id: tenant-b"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"X-User-Id: bob"</span> <span class="se">\</span>
+  <span class="nt">-d</span> <span class="s1">'{
+    "configuration": {
+      "projectId": "{projectId}",
+      "outputBindings": {
+        "summary": "context.child.summary"
+      }
+    }
+  }'</span>
+</code></pre></div></div>
+
+<p>Response highlights:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">valid</code>: whether all source output fields exist in child callable output contract</li>
+  <li><code class="language-plaintext highlighter-rouge">validSources</code>: available source fields (<code class="language-plaintext highlighter-rouge">*</code> wildcard included)</li>
+  <li><code class="language-plaintext highlighter-rouge">invalidSources</code>: unknown/mismatched fields</li>
+  <li><code class="language-plaintext highlighter-rouge">bindings</code>: normalized valid bindings</li>
+</ul>
+
+<h2 id="cross-tenant-share--consent-flow">Cross-Tenant Share + Consent Flow</h2>
+
+<ol>
+  <li>Owner creates child project as private.</li>
+  <li>Owner updates child metadata access policy to share with target tenant/user.</li>
+  <li>Requester executes parent project that references child by <code class="language-plaintext highlighter-rouge">projectId</code>.</li>
+</ol>
+
+<h3 id="access-metadata-example">Access Metadata Example</h3>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"metadata"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"access"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"ownerTenantId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tenant-a"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"ownerUserId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"alice"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"visibility"</span><span class="p">:</span><span class="w"> </span><span class="s2">"explicit"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"sharedWithUsers"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"bob"</span><span class="p">],</span><span class="w">
+      </span><span class="nl">"sharedWithTenants"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"tenant-b"</span><span class="p">],</span><span class="w">
+      </span><span class="nl">"requireConsent"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"consentGrants"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"tenantId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tenant-b"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"userId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"bob"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"permission"</span><span class="p">:</span><span class="w"> </span><span class="s2">"execute_subworkflow"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">]</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Resolver rules:</p>
+
+<ul>
+  <li>owner always allowed</li>
+  <li><code class="language-plaintext highlighter-rouge">visibility</code>: <code class="language-plaintext highlighter-rouge">private | tenant | explicit | public</code></li>
+  <li>if <code class="language-plaintext highlighter-rouge">requireConsent=true</code>, non-owner requires matching <code class="language-plaintext highlighter-rouge">consentGrants.permission=execute_subworkflow</code></li>
+</ul>
+
+<p>If access fails, execution submission is rejected during sub-workflow expansion.</p>
+
+<h2 id="callable-contract-rules-for-sub-workflow-execution">Callable Contract Rules for Sub-Workflow Execution</h2>
+
+<p>When parent workflow references child <code class="language-plaintext highlighter-rouge">projectId</code>:</p>
+
+<ul>
+  <li>child must resolve to <code class="language-plaintext highlighter-rouge">callable.mode = callable</code></li>
+  <li>callable entrypoint must be one of:
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">manual</code></li>
+      <li><code class="language-plaintext highlighter-rouge">parameterized</code></li>
+      <li><code class="language-plaintext highlighter-rouge">empty</code></li>
+    </ul>
+  </li>
+  <li>autonomous/trigger-start children are rejected as sub-workflow references</li>
+</ul>
+
+<p>For <code class="language-plaintext highlighter-rouge">entrypoint.type = parameterized</code>:</p>
+
+<ul>
+  <li>parent node must provide required inputs via one of:
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">configuration.inputs</code></li>
+      <li><code class="language-plaintext highlighter-rouge">configuration.parameters</code></li>
+      <li><code class="language-plaintext highlighter-rouge">configuration.inputBindings</code></li>
+    </ul>
+  </li>
+  <li>required input names are validated against contract</li>
+  <li>primitive type compatibility is validated (<code class="language-plaintext highlighter-rouge">string</code>, <code class="language-plaintext highlighter-rouge">number</code>, <code class="language-plaintext highlighter-rouge">integer</code>, <code class="language-plaintext highlighter-rouge">boolean</code>, <code class="language-plaintext highlighter-rouge">array</code>, <code class="language-plaintext highlighter-rouge">object</code>)</li>
+  <li>if parent pins <code class="language-plaintext highlighter-rouge">projectVersion</code>, runtime validates child callable version before execution</li>
+  <li><code class="language-plaintext highlighter-rouge">outputBindings</code> keys must match declared child <code class="language-plaintext highlighter-rouge">callable.output.properties</code> (or <code class="language-plaintext highlighter-rouge">*</code>)</li>
+</ul>
+
+<h2 id="structured-execution-error-invalid-workflow-definition">Structured Execution Error (Invalid Workflow Definition)</h2>
+
+<p>When runtime detects workflow-definition invalidity in execution phase, API returns:</p>
+
+<ul>
+  <li>HTTP <code class="language-plaintext highlighter-rouge">400</code></li>
+  <li><code class="language-plaintext highlighter-rouge">errorCode = EXECUTION_WORKFLOW_INVALID</code></li>
+  <li><code class="language-plaintext highlighter-rouge">details.phase = workflow-definition-validation</code></li>
+</ul>
+
+<p>This makes invalid-graph failures distinguishable from generic internal errors.</p>
+
+<p>Example node:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"metadata"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"child-1"</span><span class="w"> </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"custom-agent-node"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"configuration"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"projectId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"child-project-id"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"inputs"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"ticketId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"INC-123"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"priority"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="permission-matrix">Permission Matrix</h2>
+
+<p><code class="language-plaintext highlighter-rouge">allow</code> below means requester can reference child <code class="language-plaintext highlighter-rouge">projectId</code> during parent execution.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Requester</th>
+      <th>private</th>
+      <th>tenant</th>
+      <th>explicit</th>
+      <th>public</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Owner (<code class="language-plaintext highlighter-rouge">ownerTenantId</code> + <code class="language-plaintext highlighter-rouge">ownerUserId</code>)</td>
+      <td>allow</td>
+      <td>allow</td>
+      <td>allow</td>
+      <td>allow</td>
+    </tr>
+    <tr>
+      <td>Same tenant, different user</td>
+      <td>deny (unless explicitly shared; standalone may allow if no user context)</td>
+      <td>allow</td>
+      <td>deny unless shared</td>
+      <td>allow</td>
+    </tr>
+    <tr>
+      <td>Different tenant, shared tenant</td>
+      <td>deny</td>
+      <td>allow if tenant shared</td>
+      <td>allow if tenant shared</td>
+      <td>allow</td>
+    </tr>
+    <tr>
+      <td>Different tenant, shared user</td>
+      <td>deny</td>
+      <td>allow if user shared</td>
+      <td>allow if user shared</td>
+      <td>allow</td>
+    </tr>
+    <tr>
+      <td>Unshared external requester</td>
+      <td>deny</td>
+      <td>deny</td>
+      <td>deny</td>
+      <td>allow</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Consent overlay (<code class="language-plaintext highlighter-rouge">requireConsent=true</code>):</p>
+
+<ul>
+  <li>owner stays allowed</li>
+  <li>non-owner rows above require matching <code class="language-plaintext highlighter-rouge">consentGrants</code> entry with:
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">tenantId</code> + <code class="language-plaintext highlighter-rouge">userId</code> matching requester</li>
+      <li><code class="language-plaintext highlighter-rouge">permission = execute_subworkflow</code></li>
+    </ul>
+  </li>
+  <li>without matching grant: deny</li>
+</ul>
+
+<h2 id="related-docs">Related Docs</h2>
+
+<ul>
+  <li><a href="./schema-catalog">Schema Catalog and WayangSpec</a></li>
+  <li><a href="./telemetry-api">Execution Telemetry API</a></li>
+  <li><a href="./debugger-api">Debugger API</a></li>
+  <li><a href="./wayang-assistant">Wayang Assistant</a></li>
+  <li><a href="./standalone-troubleshooting">Standalone Troubleshooting</a></li>
+</ul>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>Wayang AI Docs</span>
+      <a href="https://github.com/wayang-ai/wayang-platform">wayang-ai/wayang-platform</a>
+    </div>
+  </footer>
+</body>
+</html>

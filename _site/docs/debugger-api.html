@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Debugger API | Wayang AI</title>
+  <meta name="description" content="Wayang AI documentation and platform guides for building agentic workflows.">
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('wayang-theme');
+        var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        var theme = stored || (prefersLight ? 'light' : 'dark');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <div class="site-bg" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand">Wayang AI</a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="/docs/">Docs</a>
+        <a href="/docs/javadoc">Javadoc</a>
+        <a href="/features/">Features</a>
+        <a href="/about/">About</a>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme">Theme</button>
+        <a href="https://github.com/wayang-ai/wayang-platform">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container content-shell">
+    <h1 id="debugger-api">Debugger API</h1>
+
+<p>Standalone runtime now exposes debugger endpoints via <code class="language-plaintext highlighter-rouge">wayang-debugger</code>.</p>
+
+<p>Base path:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">/api/v1/debug/projects/{projectId}/executions/{executionId}</code></li>
+</ul>
+
+<h2 id="endpoints">Endpoints</h2>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">GET /events</code></li>
+  <li><code class="language-plaintext highlighter-rouge">GET /telemetry</code></li>
+  <li><code class="language-plaintext highlighter-rouge">GET /lineage</code></li>
+  <li><code class="language-plaintext highlighter-rouge">GET /snapshot</code></li>
+</ul>
+
+<p>These endpoints reuse the same execution data as Projects API and are intended for UI troubleshooting workflows.</p>
+
+<h2 id="examples">Examples</h2>
+
+<p>Get raw execution events:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="s2">"http://localhost:31713/api/v1/debug/projects/{projectId}/executions/{executionId}/events"</span>
+</code></pre></div></div>
+
+<p>Get telemetry with filters:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="s2">"http://localhost:31713/api/v1/debug/projects/{projectId}/executions/{executionId}/telemetry?groupBy=nodeId&amp;sort=tasksExecuted:desc&amp;limit=20"</span>
+</code></pre></div></div>
+
+<p>Get lineage focused projection:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="s2">"http://localhost:31713/api/v1/debug/projects/{projectId}/executions/{executionId}/lineage?view=compact&amp;include=executionContext,status,updatedAt"</span>
+</code></pre></div></div>
+
+<p>Get one-shot snapshot for debugging:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="s2">"http://localhost:31713/api/v1/debug/projects/{projectId}/executions/{executionId}/snapshot?includeRaw=true&amp;eventsLimit=200"</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">snapshot</code> includes:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">status</code>: execution status payload</li>
+  <li><code class="language-plaintext highlighter-rouge">events</code>: execution timeline events</li>
+  <li><code class="language-plaintext highlighter-rouge">telemetry</code>: aggregated telemetry payload</li>
+  <li><code class="language-plaintext highlighter-rouge">lineage</code>: sub-workflow lineage payload</li>
+</ul>
+
+<h2 id="runtime-wiring-notes">Runtime Wiring Notes</h2>
+
+<p>The debugger module is wired in standalone mode with:</p>
+
+<ul>
+  <li>dependency: <code class="language-plaintext highlighter-rouge">tech.kayys.wayang:wayang-debugger</code></li>
+  <li>index config:
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">quarkus.index-dependency.wayang-debugger.group-id=tech.kayys.wayang</code></li>
+      <li><code class="language-plaintext highlighter-rouge">quarkus.index-dependency.wayang-debugger.artifact-id=wayang-debugger</code></li>
+    </ul>
+  </li>
+</ul>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>Wayang AI Docs</span>
+      <a href="https://github.com/wayang-ai/wayang-platform">wayang-ai/wayang-platform</a>
+    </div>
+  </footer>
+</body>
+</html>

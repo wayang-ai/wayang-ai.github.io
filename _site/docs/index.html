@@ -1,0 +1,1124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Documentation | Wayang AI</title>
+  <meta name="description" content="Wayang AI documentation and platform guides for building agentic workflows.">
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('wayang-theme');
+        var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        var theme = stored || (prefersLight ? 'light' : 'dark');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <div class="site-bg" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand">Wayang AI</a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="/docs/">Docs</a>
+        <a href="/docs/javadoc">Javadoc</a>
+        <a href="/features/">Features</a>
+        <a href="/about/">About</a>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme">Theme</button>
+        <a href="https://github.com/wayang-ai/wayang-platform">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container content-shell">
+    <h1 id="documentation">Documentation</h1>
+
+<p>Get started with Wayang AI and learn how to build powerful AI agent workflows.</p>
+
+<hr />
+
+<h2 id="api-reference">API Reference</h2>
+
+<ul>
+  <li><strong><a href="./javadoc">Javadoc API Reference</a></strong> - Complete Java API documentation</li>
+  <li><strong><a href="./projects-api">Projects API</a></strong> - Project management and execution APIs</li>
+  <li><strong><a href="./schema-catalog">Schema Catalog</a></strong> - Schema registry and WayangSpec</li>
+  <li><strong><a href="./sdk-gateway">SDK Gateway</a></strong> - Gollek SDK Gateway &amp; SPI</li>
+  <li><strong><a href="./wayang-assistant">Wayang Assistant API</a></strong> - Chat, project generation, and troubleshooting APIs</li>
+</ul>
+
+<hr />
+
+<h2 id="deep-dive-guides">Deep Dive Guides</h2>
+
+<ul>
+  <li><a href="./agent-skills">Agent Skills</a></li>
+  <li><a href="./react-mechanism">ReAct Tool Execution</a></li>
+  <li><a href="./sdk-gateway">Gollek SDK Gateway &amp; SPI</a></li>
+  <li><a href="./audit-mechanism">Agent Audit Mechanism</a></li>
+  <li><a href="./designer-user-guide">Wayang Kulit User Guide</a></li>
+  <li><a href="./designer-release-notes">Wayang Kulit Release Notes</a></li>
+  <li><a href="./schema-catalog">Schema Catalog and WayangSpec</a></li>
+  <li><a href="./projects-api">Projects API</a></li>
+  <li><a href="./wayang-assistant">Wayang Assistant</a></li>
+  <li><a href="./triggers">Trigger Integrations</a></li>
+  <li><a href="./hitl">HITL Execution Flow</a></li>
+  <li><a href="./rag">RAG API</a></li>
+  <li><a href="./mcp">MCP API Coverage</a></li>
+  <li><a href="./guardrails">Guardrails API &amp; Execution</a></li>
+  <li><a href="./telemetry-api">Execution Telemetry API</a></li>
+  <li><a href="./debugger-api">Execution Debugger API</a></li>
+  <li><a href="./standalone-troubleshooting">Standalone Troubleshooting</a></li>
+  <li><a href="./testing-coverage">Testing Coverage</a></li>
+</ul>
+
+<hr />
+
+<h2 id="quick-start-guide">Quick Start Guide</h2>
+
+<h3 id="1-installation">1. Installation</h3>
+
+<p>Install the Wayang AI CLI tool:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>npm <span class="nb">install</span> <span class="nt">-g</span> @wayang-ai/cli
+</code></pre></div></div>
+
+<p>Or use npx for one-off commands:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>npx @wayang-ai/cli
+</code></pre></div></div>
+
+<h3 id="2-create-your-first-project">2. Create Your First Project</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Create a new project</span>
+wayang create my-first-workflow
+
+<span class="c"># Navigate to the project</span>
+<span class="nb">cd </span>my-first-workflow
+</code></pre></div></div>
+
+<h3 id="3-configure-your-api-keys">3. Configure Your API Keys</h3>
+
+<p>Set up your AI provider credentials:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># For OpenAI</span>
+wayang config <span class="nb">set </span>OPENAI_API_KEY your-api-key
+
+<span class="c"># For Anthropic</span>
+wayang config <span class="nb">set </span>ANTHROPIC_API_KEY your-api-key
+</code></pre></div></div>
+
+<h3 id="4-create-a-simple-workflow">4. Create a Simple Workflow</h3>
+
+<p>Create a file named <code class="language-plaintext highlighter-rouge">workflow.yaml</code>:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">name</span><span class="pi">:</span> <span class="s">Hello World</span>
+<span class="na">description</span><span class="pi">:</span> <span class="s">A simple greeting workflow</span>
+
+<span class="na">agents</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">id</span><span class="pi">:</span> <span class="s">greeter</span>
+    <span class="na">type</span><span class="pi">:</span> <span class="s">llm</span>
+    <span class="na">model</span><span class="pi">:</span> <span class="s">openai/gpt-4</span>
+    <span class="na">prompt</span><span class="pi">:</span> <span class="s2">"</span><span class="s">Greet</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">user</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">ask</span><span class="nv"> </span><span class="s">how</span><span class="nv"> </span><span class="s">you</span><span class="nv"> </span><span class="s">can</span><span class="nv"> </span><span class="s">help</span><span class="nv"> </span><span class="s">them</span><span class="nv"> </span><span class="s">today."</span>
+
+<span class="na">execution</span><span class="pi">:</span>
+  <span class="na">start</span><span class="pi">:</span> <span class="s">greeter</span>
+</code></pre></div></div>
+
+<h3 id="5-run-your-workflow">5. Run Your Workflow</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Development mode with hot reload</span>
+wayang dev
+
+<span class="c"># Or run once</span>
+wayang run workflow.yaml
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="core-concepts">Core Concepts</h2>
+
+<h3 id="agents--skills">Agents &amp; Skills</h3>
+
+<p>Agents are the building blocks of Wayang AI workflows. In the latest architecture, agents are driven by <strong>Skills</strong> — data-driven personas defined in JSON.</p>
+
+<ul>
+  <li><strong>Skills</strong> define the persona, system prompts, and parameters.</li>
+  <li><strong>Native Vector Search (FAISS)</strong> - JDK 25 powered high-performance memory and RAG backend.</li>
+  <li><strong>Unified Executor</strong> handles the inference logic for all skills.</li>
+  <li><strong>Dynamic</strong> - Create new agent personas without code changes.</li>
+</ul>
+
+<p>For a detailed look at the architecture, see the <a href="./agent-skills">Agent Skills Guide</a>.</p>
+
+<h4 id="orchestrator-loop-pattern">Orchestrator Loop Pattern</h4>
+
+<p>In multi-agent execution, the <strong>orchestrator-skill</strong> managing the control-plane coordination:</p>
+
+<ol>
+  <li><strong>planner-skill</strong> creates or revises plan steps</li>
+  <li><strong>execution skills</strong> run plan steps (<code class="language-plaintext highlighter-rouge">coder</code>, <code class="language-plaintext highlighter-rouge">analytics</code>, etc.)</li>
+  <li><strong>evaluator-skill</strong> assesses outputs and quality</li>
+  <li><strong>orchestrator-skill</strong> decides continue, retry, or re-plan</li>
+</ol>
+
+<p>This pattern keeps specialized logic in individual skills while loop state stays centralized in the orchestrator.</p>
+
+<pre><code class="language-mermaid">sequenceDiagram
+  participant O as Orchestrator Skill
+  participant P as Planner Skill
+  participant X as Executor Skill (Coder/Basic)
+  participant E as Evaluator Skill
+
+  O-&gt;&gt;P: Create initial plan
+  P--&gt;&gt;O: Plan v1
+  O-&gt;&gt;X: Execute planned step(s)
+  X--&gt;&gt;O: Execution result(s)
+  O-&gt;&gt;E: Evaluate quality/completeness
+  E--&gt;&gt;O: Evaluation + feedback
+  alt Needs re-plan
+    O-&gt;&gt;P: Revise plan with feedback
+    P--&gt;&gt;O: Plan v2
+    O-&gt;&gt;X: Execute revised plan
+    X--&gt;&gt;O: Revised result(s)
+    O-&gt;&gt;E: Re-evaluate
+    E--&gt;&gt;O: Pass
+  else Pass on first cycle
+    E--&gt;&gt;O: Pass
+  end
+  O--&gt;&gt;O: Finalize workflow result
+</code></pre>
+
+<h4 id="built-in-skill-aliases">Built-in Skill Aliases</h4>
+
+<p>The following built-in skills are available:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Canonical ID</th>
+      <th>Aliases</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">planner</code></td>
+      <td><code class="language-plaintext highlighter-rouge">planner-agent</code>, <code class="language-plaintext highlighter-rouge">agent-planner</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">coder</code></td>
+      <td><code class="language-plaintext highlighter-rouge">coder-agent</code>, <code class="language-plaintext highlighter-rouge">agent-coder</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">analytics</code></td>
+      <td><code class="language-plaintext highlighter-rouge">analytics-agent</code>, <code class="language-plaintext highlighter-rouge">agent-analytic</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">evaluator</code></td>
+      <td><code class="language-plaintext highlighter-rouge">evaluator-agent</code>, <code class="language-plaintext highlighter-rouge">agent-evaluator</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">common</code></td>
+      <td><code class="language-plaintext highlighter-rouge">common-agent</code>, <code class="language-plaintext highlighter-rouge">agent-basic</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="typed-inputs-by-agent-type">Typed Inputs by Agent Type</h4>
+
+<p>For schema-driven execution payloads, these typed fields are available and recommended:</p>
+
+<ul>
+  <li>basic (<code class="language-plaintext highlighter-rouge">agent-basic</code>): generic common-task context + shared provider/vault fields</li>
+  <li>coder (<code class="language-plaintext highlighter-rouge">agent-coder</code>): <code class="language-plaintext highlighter-rouge">instruction</code>, optional <code class="language-plaintext highlighter-rouge">taskType</code> (default: <code class="language-plaintext highlighter-rouge">GENERATE</code>)</li>
+  <li>analytic (<code class="language-plaintext highlighter-rouge">agent-analytic</code>): <code class="language-plaintext highlighter-rouge">question</code>, optional <code class="language-plaintext highlighter-rouge">taskType</code> (default: <code class="language-plaintext highlighter-rouge">DESCRIPTIVE</code>)</li>
+  <li>planner (<code class="language-plaintext highlighter-rouge">agent-planner</code>): <code class="language-plaintext highlighter-rouge">goal</code>, <code class="language-plaintext highlighter-rouge">strategy</code> (also supports <code class="language-plaintext highlighter-rouge">objective</code> / <code class="language-plaintext highlighter-rouge">instruction</code>)</li>
+  <li>evaluator (<code class="language-plaintext highlighter-rouge">agent-evaluator</code>): <code class="language-plaintext highlighter-rouge">candidateOutput</code>, <code class="language-plaintext highlighter-rouge">criteria</code> (fallbacks: <code class="language-plaintext highlighter-rouge">output</code> / <code class="language-plaintext highlighter-rouge">result</code> / <code class="language-plaintext highlighter-rouge">content</code>)</li>
+  <li>orchestrator (<code class="language-plaintext highlighter-rouge">agent-orchestrator</code>): <code class="language-plaintext highlighter-rouge">objective</code> or <code class="language-plaintext highlighter-rouge">agentTasks</code> with <code class="language-plaintext highlighter-rouge">orchestrationType</code> / <code class="language-plaintext highlighter-rouge">coordinationStrategy</code>, and loop budgets <code class="language-plaintext highlighter-rouge">maxIterations</code> / <code class="language-plaintext highlighter-rouge">maxDelegations</code> / <code class="language-plaintext highlighter-rouge">maxLatencyMs</code> / <code class="language-plaintext highlighter-rouge">maxAgentLatencyMs</code> / <code class="language-plaintext highlighter-rouge">maxRetriesPerDelegation</code></li>
+</ul>
+
+<p>These fields are exposed in <code class="language-plaintext highlighter-rouge">/v1/schema/catalog</code> and validated by runtime schema/API and executor tests.</p>
+
+<p>Example orchestration payload (planner -&gt; coder -&gt; evaluator -&gt; planner re-plan):</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"orchestrationType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"SEQUENTIAL"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"coordinationStrategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"CENTRALIZED"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"agentTasks"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="nl">"agentType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"planner-agent"</span><span class="p">,</span><span class="w"> </span><span class="nl">"context"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nl">"step"</span><span class="p">:</span><span class="w"> </span><span class="s2">"plan-v1"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="nl">"agentType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"coder-agent"</span><span class="p">,</span><span class="w"> </span><span class="nl">"context"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nl">"step"</span><span class="p">:</span><span class="w"> </span><span class="s2">"execute"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="nl">"agentType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"evaluator-agent"</span><span class="p">,</span><span class="w"> </span><span class="nl">"context"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nl">"step"</span><span class="p">:</span><span class="w"> </span><span class="s2">"evaluate"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w"> </span><span class="nl">"agentType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"planner-agent"</span><span class="p">,</span><span class="w"> </span><span class="nl">"context"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nl">"step"</span><span class="p">:</span><span class="w"> </span><span class="s2">"plan-v2"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<h3 id="workflows">Workflows</h3>
+
+<p>Workflows define how agents collaborate to achieve a goal.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">workflow</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">Research Assistant</span>
+  <span class="na">agents</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">researcher</span>
+    <span class="pi">-</span> <span class="s">writer</span>
+    <span class="pi">-</span> <span class="s">reviewer</span>
+  
+  <span class="na">flow</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">researcher -&gt; writer</span>
+    <span class="pi">-</span> <span class="s">writer -&gt; reviewer</span>
+    <span class="pi">-</span> <span class="s">reviewer -&gt; (end)</span>
+</code></pre></div></div>
+
+<h3 id="tools">Tools</h3>
+
+<p>Tools extend agent capabilities with external integrations.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">tools</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">web_search</span>
+    <span class="na">type</span><span class="pi">:</span> <span class="s">builtin</span>
+    <span class="na">provider</span><span class="pi">:</span> <span class="s">google</span>
+  
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">database</span>
+    <span class="na">type</span><span class="pi">:</span> <span class="s">custom</span>
+    <span class="na">connection</span><span class="pi">:</span> <span class="s">postgres://localhost/mydb</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="cli-reference">CLI Reference</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Command</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">wayang create &lt;name&gt;</code></td>
+      <td>Create a new project</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">wayang dev</code></td>
+      <td>Start development server</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">wayang run &lt;workflow&gt;</code></td>
+      <td>Execute a workflow</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">wayang deploy</code></td>
+      <td>Deploy to production</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">wayang logs</code></td>
+      <td>View execution logs</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">wayang config</code></td>
+      <td>Manage configuration</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">wayang agents</code></td>
+      <td>List available agents</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">wayang --help</code></td>
+      <td>Show help information</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="configuration-reference">Configuration Reference</h2>
+
+<h3 id="environment-variables">Environment Variables</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Required</span>
+<span class="nv">WAYANG_API_KEY</span><span class="o">=</span>your-wayang-api-key
+
+<span class="c"># AI Providers</span>
+<span class="nv">OPENAI_API_KEY</span><span class="o">=</span>sk-...
+<span class="nv">ANTHROPIC_API_KEY</span><span class="o">=</span>sk-ant-...
+<span class="nv">GOOGLE_API_KEY</span><span class="o">=</span>...
+
+<span class="c"># Optional</span>
+<span class="nv">WAYANG_LOG_LEVEL</span><span class="o">=</span>debug
+<span class="nv">WAYANG_PORT</span><span class="o">=</span>3000
+<span class="nv">WAYANG_ENV</span><span class="o">=</span>development
+</code></pre></div></div>
+
+<h3 id="standalone-runtime-logging">Standalone Runtime Logging</h3>
+
+<p>Wayang Standalone writes server logs to:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>~/.wayang/logs/server/server.log
+</code></pre></div></div>
+
+<p>Default severity is <code class="language-plaintext highlighter-rouge">INFO</code> (which includes <code class="language-plaintext highlighter-rouge">INFO</code>, <code class="language-plaintext highlighter-rouge">WARN</code>, and <code class="language-plaintext highlighter-rouge">ERROR</code> messages).</p>
+
+<p>You can configure logging using environment variables:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Variable</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">WAYANG_LOG_LEVEL</code></td>
+      <td><code class="language-plaintext highlighter-rouge">INFO</code></td>
+      <td>Root log severity</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">WAYANG_LOG_LEVEL_TECH_KAYYS</code></td>
+      <td><code class="language-plaintext highlighter-rouge">${WAYANG_LOG_LEVEL}</code></td>
+      <td>Log level for <code class="language-plaintext highlighter-rouge">tech.kayys.*</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">WAYANG_LOG_LEVEL_QUARKUS</code></td>
+      <td><code class="language-plaintext highlighter-rouge">WARN</code></td>
+      <td>Log level for <code class="language-plaintext highlighter-rouge">io.quarkus.*</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">WAYANG_LOG_LEVEL_GGUF_MIN</code></td>
+      <td><code class="language-plaintext highlighter-rouge">INFO</code></td>
+      <td>Minimum level for GGUF converter logs</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">WAYANG_LOG_FILE_ENABLED</code></td>
+      <td><code class="language-plaintext highlighter-rouge">true</code></td>
+      <td>Enable/disable file logging</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">WAYANG_SERVER_LOG_DIR</code></td>
+      <td><code class="language-plaintext highlighter-rouge">~/.wayang/logs/server</code></td>
+      <td>Server log directory</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">WAYANG_LOG_FILE_PATH</code></td>
+      <td><code class="language-plaintext highlighter-rouge">${WAYANG_SERVER_LOG_DIR}/server.log</code></td>
+      <td>Server log file path</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">WAYANG_LOG_FILE_LEVEL</code></td>
+      <td><code class="language-plaintext highlighter-rouge">${WAYANG_LOG_LEVEL}</code></td>
+      <td>File log severity</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">WAYANG_LOG_FILE_FORMAT</code></td>
+      <td><code class="language-plaintext highlighter-rouge">%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p [%c{2.}] (%t) %s%e%n</code></td>
+      <td>File log pattern</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">WAYANG_LOG_ROTATE_MAX_FILE_SIZE</code></td>
+      <td><code class="language-plaintext highlighter-rouge">20M</code></td>
+      <td>Rotation size threshold</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">WAYANG_LOG_ROTATE_MAX_BACKUP_INDEX</code></td>
+      <td><code class="language-plaintext highlighter-rouge">10</code></td>
+      <td>Number of retained rotated files</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Example:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">WAYANG_LOG_LEVEL</span><span class="o">=</span>WARN
+<span class="nb">export </span><span class="nv">WAYANG_SERVER_LOG_DIR</span><span class="o">=</span><span class="nv">$HOME</span>/.wayang/logs/server
+<span class="nb">export </span><span class="nv">WAYANG_LOG_FILE_PATH</span><span class="o">=</span><span class="nv">$WAYANG_SERVER_LOG_DIR</span>/server.log
+<span class="nb">export </span><span class="nv">WAYANG_LOG_ROTATE_MAX_FILE_SIZE</span><span class="o">=</span>50M
+<span class="nb">export </span><span class="nv">WAYANG_LOG_ROTATE_MAX_BACKUP_INDEX</span><span class="o">=</span>20
+</code></pre></div></div>
+
+<h3 id="project-configuration-wayangconfigjs">Project Configuration (wayang.config.js)</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">my-workflow</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">version</span><span class="p">:</span> <span class="dl">'</span><span class="s1">1.0.0</span><span class="dl">'</span><span class="p">,</span>
+  
+  <span class="na">agents</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">default</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">model</span><span class="p">:</span> <span class="dl">'</span><span class="s1">openai/gpt-4</span><span class="dl">'</span><span class="p">,</span>
+      <span class="na">temperature</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">,</span>
+    <span class="p">},</span>
+  <span class="p">},</span>
+  
+  <span class="na">execution</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">timeout</span><span class="p">:</span> <span class="mi">30000</span><span class="p">,</span>
+    <span class="na">retries</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+  <span class="p">},</span>
+  
+  <span class="na">integrations</span><span class="p">:</span> <span class="p">{</span>
+    <span class="na">slack</span><span class="p">:</span> <span class="p">{</span>
+      <span class="na">webhook</span><span class="p">:</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">SLACK_WEBHOOK</span><span class="p">,</span>
+    <span class="p">},</span>
+  <span class="p">},</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<h3 id="project-execution-api-wayangspec-payload">Project Execution API (WayangSpec Payload)</h3>
+
+<p>Execute a <code class="language-plaintext highlighter-rouge">WayangSpec</code> directly within a project:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-X</span> POST <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/executions"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"X-Tenant-Id: community"</span> <span class="se">\</span>
+  <span class="nt">-d</span> <span class="s1">'{
+    "name": "demo-execution",
+    "description": "Run ad-hoc spec",
+    "spec": { "workflow": { "name": "Demo" } },
+    "inputs": { "query": "hello" },
+    "createdBy": "api"
+  }'</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">/api/v1/projects/{projectId}/execute-spec</code> is also supported as an alias.
+The request accepts <code class="language-plaintext highlighter-rouge">spec</code>, <code class="language-plaintext highlighter-rouge">wayangSpec</code>, or <code class="language-plaintext highlighter-rouge">workflowSpec</code> as payload keys.</p>
+
+<p>Dry-run (validation only, no execution started):</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-X</span> POST <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/executions"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"X-Tenant-Id: community"</span> <span class="se">\</span>
+  <span class="nt">-d</span> <span class="s1">'{
+    "name": "demo-dry-run",
+    "dryRun": true,
+    "spec": { "workflow": { "name": "Demo" } }
+  }'</span>
+</code></pre></div></div>
+
+<p>Dry-run returns <code class="language-plaintext highlighter-rouge">status: DRY_RUN_VALID</code> and does not create an execution record.</p>
+
+<p>Idempotent execution submit (safe retry):</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-X</span> POST <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/executions"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"X-Tenant-Id: community"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"Idempotency-Key: run-123"</span> <span class="se">\</span>
+  <span class="nt">-d</span> <span class="s1">'{
+    "name": "demo-execution",
+    "spec": { "workflow": { "name": "Demo" } }
+  }'</span>
+</code></pre></div></div>
+
+<p>If the same key is submitted again for the same project+tenant, API returns the existing execution with <code class="language-plaintext highlighter-rouge">idempotentReplay: true</code> and does not start a duplicate run.</p>
+
+<p>Replay window control:</p>
+
+<ul>
+  <li>request field <code class="language-plaintext highlighter-rouge">idempotencyReplayWindowSeconds</code> controls per-request replay TTL</li>
+  <li>runtime property <code class="language-plaintext highlighter-rouge">wayang.runtime.standalone.execution.idempotency.replay-window-seconds</code> controls default replay TTL (default <code class="language-plaintext highlighter-rouge">86400</code>)</li>
+  <li>set replay window to <code class="language-plaintext highlighter-rouge">0</code> to disable dedup replay for that submit</li>
+</ul>
+
+<p>Request correlation (trace execution across API, logs, and events):</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-X</span> POST <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/executions"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"X-Tenant-Id: community"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"X-Request-Id: req-abc-123"</span> <span class="se">\</span>
+  <span class="nt">-d</span> <span class="s1">'{
+    "name": "demo-execution",
+    "spec": { "workflow": { "name": "Demo" } }
+  }'</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">X-Request-Id</code> is echoed as <code class="language-plaintext highlighter-rouge">requestId</code> in the execution response and persisted in execution timeline event metadata.</p>
+
+<p>Execution submit responses also include rate-limit headers:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">X-RateLimit-Limit</code></li>
+  <li><code class="language-plaintext highlighter-rouge">X-RateLimit-Remaining</code></li>
+  <li><code class="language-plaintext highlighter-rouge">X-RateLimit-Reset</code></li>
+</ul>
+
+<p>If submit rate is exceeded, API returns <code class="language-plaintext highlighter-rouge">429 EXECUTION_RATE_LIMITED</code> with <code class="language-plaintext highlighter-rouge">Retry-After</code>.
+Backpressure saturation returns <code class="language-plaintext highlighter-rouge">503 EXECUTION_BACKPRESSURE</code> with <code class="language-plaintext highlighter-rouge">Retry-After</code>.
+Runtime properties:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">wayang.runtime.standalone.execution.rate-limit.enabled</code> (default <code class="language-plaintext highlighter-rouge">true</code>)</li>
+  <li><code class="language-plaintext highlighter-rouge">wayang.runtime.standalone.execution.rate-limit.per-minute</code> (default <code class="language-plaintext highlighter-rouge">120</code>)</li>
+  <li><code class="language-plaintext highlighter-rouge">wayang.runtime.standalone.execution.max-in-flight-submits</code> (default <code class="language-plaintext highlighter-rouge">64</code>)</li>
+</ul>
+
+<h3 id="schema-catalog-and-workflow-spec">Schema Catalog and Workflow Spec</h3>
+
+<p>See the dedicated guide: <a href="./schema-catalog">Schema Catalog and WayangSpec</a>.</p>
+
+<h3 id="trigger-integrations-server-side">Trigger Integrations (Server-Side)</h3>
+
+<p>See the dedicated guide: <a href="./triggers">Trigger Integrations</a>.</p>
+
+<h4 id="orchestrator-api-examples">Orchestrator API Examples</h4>
+
+<p>You can run orchestrator behavior through project execution payloads by including an <code class="language-plaintext highlighter-rouge">orchestrator-agent</code> node context in your <code class="language-plaintext highlighter-rouge">WayangSpec</code>.</p>
+
+<p>Objective-driven orchestration:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"orchestrator-objective-run"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"spec"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"workflow"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"orchestrator-objective"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"nodes"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"orchestrator_1"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"orchestrator-agent"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"configuration"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"objective"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Build API, verify quality, and produce final summary"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"taskType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"DELEGATE"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"agentType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"orchestrator-agent"</span><span class="w">
+          </span><span class="p">}</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">]</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Loop-style multi-agent orchestration (<code class="language-plaintext highlighter-rouge">planner -&gt; coder -&gt; evaluator -&gt; planner</code>):</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"orchestrator-loop-run"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"spec"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"workflow"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"orchestrator-loop"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"nodes"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"orchestrator_1"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"orchestrator-agent"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"configuration"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"agentType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"orchestrator-agent"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"orchestrationType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"SEQUENTIAL"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"coordinationStrategy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"CENTRALIZED"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"maxIterations"</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"maxLatencyMs"</span><span class="p">:</span><span class="w"> </span><span class="mi">5000</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"agentTasks"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+              </span><span class="p">{</span><span class="w"> </span><span class="nl">"agentType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"planner-agent"</span><span class="p">,</span><span class="w"> </span><span class="nl">"context"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nl">"step"</span><span class="p">:</span><span class="w"> </span><span class="s2">"plan-v1"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">},</span><span class="w">
+              </span><span class="p">{</span><span class="w"> </span><span class="nl">"agentType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"coder-agent"</span><span class="p">,</span><span class="w"> </span><span class="nl">"context"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nl">"step"</span><span class="p">:</span><span class="w"> </span><span class="s2">"execute"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">},</span><span class="w">
+              </span><span class="p">{</span><span class="w"> </span><span class="nl">"agentType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"evaluator-agent"</span><span class="p">,</span><span class="w"> </span><span class="nl">"context"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nl">"step"</span><span class="p">:</span><span class="w"> </span><span class="s2">"evaluate"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">},</span><span class="w">
+              </span><span class="p">{</span><span class="w"> </span><span class="nl">"agentType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"planner-agent"</span><span class="p">,</span><span class="w"> </span><span class="nl">"context"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nl">"step"</span><span class="p">:</span><span class="w"> </span><span class="s2">"plan-v2"</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span><span class="w">
+            </span><span class="p">]</span><span class="w">
+          </span><span class="p">}</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">]</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Run objective mode via API:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-X</span> POST <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/executions"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"X-Tenant-Id: community"</span> <span class="se">\</span>
+  <span class="nt">-d</span> <span class="s1">'{
+    "name": "orchestrator-objective-run",
+    "spec": {
+      "workflow": {
+        "name": "orchestrator-objective",
+        "nodes": [
+          {
+            "id": "orchestrator_1",
+            "type": "orchestrator-agent",
+            "configuration": {
+              "objective": "Build API, verify quality, and produce final summary",
+              "taskType": "DELEGATE",
+              "agentType": "orchestrator-agent"
+            }
+          }
+        ]
+      }
+    }
+  }'</span>
+</code></pre></div></div>
+
+<p>Example response (<code class="language-plaintext highlighter-rouge">202 Accepted</code>):</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"projectId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"f3c26d6a-4e8a-4dbe-9216-9ef2c99eb68e"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"definitionId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"37ef89b7-7e4a-4eca-a978-f1fe5ea7f523"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"workflowDefinitionId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"wf_orchestrator_objective"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"executionId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"run_orch_obj_001"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"STARTED"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Run loop mode via API:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-X</span> POST <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/executions"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"X-Tenant-Id: community"</span> <span class="se">\</span>
+  <span class="nt">-d</span> <span class="s1">'{
+    "name": "orchestrator-loop-run",
+    "spec": {
+      "workflow": {
+        "name": "orchestrator-loop",
+        "nodes": [
+          {
+            "id": "orchestrator_1",
+            "type": "orchestrator-agent",
+            "configuration": {
+              "agentType": "orchestrator-agent",
+              "orchestrationType": "SEQUENTIAL",
+              "coordinationStrategy": "CENTRALIZED",
+              "agentTasks": [
+                { "agentType": "planner-agent", "context": { "step": "plan-v1" } },
+                { "agentType": "coder-agent", "context": { "step": "execute" } },
+                { "agentType": "evaluator-agent", "context": { "step": "evaluate" } },
+                { "agentType": "planner-agent", "context": { "step": "plan-v2" } }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }'</span>
+</code></pre></div></div>
+
+<p>Example response (<code class="language-plaintext highlighter-rouge">202 Accepted</code>):</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"projectId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"f3c26d6a-4e8a-4dbe-9216-9ef2c99eb68e"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"definitionId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"efbd50a3-3dcf-4dc4-9c42-4c00657d8d8a"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"workflowDefinitionId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"wf_orchestrator_loop"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"executionId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"run_orch_loop_001"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"STARTED"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Check orchestrator execution status:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/executions/{executionId}"</span>
+</code></pre></div></div>
+
+<p>Example status response:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"executionId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"run_orch_loop_001"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"projectId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"f3c26d6a-4e8a-4dbe-9216-9ef2c99eb68e"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"RUNNING"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"createdBy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"api"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"createdAt"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-03-05T15:10:00Z"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"updatedAt"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-03-05T15:10:04Z"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Get orchestrator loop timeline events:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/executions/{executionId}/events"</span>
+</code></pre></div></div>
+
+<p>Example timeline response:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"events"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"eventType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"NODE_STARTED"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"nodeId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"orchestrator_1-planner-agent"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Planner created initial plan"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"timestamp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-03-05T15:10:05Z"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"eventType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"NODE_COMPLETED"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"nodeId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"orchestrator_1-coder-agent"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Coder executed planned task"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"timestamp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-03-05T15:10:08Z"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"eventType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"NODE_COMPLETED"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"nodeId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"orchestrator_1-evaluator-agent"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Evaluator scored output and requested re-plan"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"timestamp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-03-05T15:10:10Z"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"eventType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"NODE_COMPLETED"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"nodeId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"orchestrator_1-planner-agent"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Planner produced revised plan (loop iteration 2)"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"timestamp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-03-05T15:10:13Z"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Response (<code class="language-plaintext highlighter-rouge">202 Accepted</code>):</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"projectId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"f3c26d6a-4e8a-4dbe-9216-9ef2c99eb68e"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"definitionId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"37ef89b7-7e4a-4eca-a978-f1fe5ea7f523"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"workflowDefinitionId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"wf_abc123"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"executionId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"run_abc123"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"queuedAt"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-03-07T00:10:00Z"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"startedAt"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-03-07T00:10:01Z"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"queueDurationMs"</span><span class="p">:</span><span class="w"> </span><span class="mi">120</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"STARTED"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Check execution status:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/executions/{executionId}"</span>
+</code></pre></div></div>
+
+<p>Execution status response includes <code class="language-plaintext highlighter-rouge">ETag</code> based on execution version.
+Use conditional GET to reduce polling payload:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-i</span> <span class="nt">-H</span> <span class="s1">'accept: application/json'</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s1">'If-None-Match: "2"'</span> <span class="se">\</span>
+  <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/executions/{executionId}"</span>
+</code></pre></div></div>
+
+<p>If unchanged, server returns <code class="language-plaintext highlighter-rouge">304 Not Modified</code>.</p>
+
+<p>Example status response:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"executionId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"run_abc123"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"projectId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"f3c26d6a-4e8a-4dbe-9216-9ef2c99eb68e"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"tenantId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"community"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"definitionId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"37ef89b7-7e4a-4eca-a978-f1fe5ea7f523"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"workflowDefinitionId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"wf_abc123"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"RUNNING"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"createdBy"</span><span class="p">:</span><span class="w"> </span><span class="s2">"api"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"createdAt"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-03-05T13:10:00Z"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"updatedAt"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-03-05T13:10:04Z"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>List executions for a project:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/executions"</span>
+</code></pre></div></div>
+
+<p>Stop an execution:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-X</span> POST <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/executions/{executionId}/stop"</span>
+</code></pre></div></div>
+
+<p>Stop with reason taxonomy and operator note:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-X</span> POST <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/executions/{executionId}/stop"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span> <span class="se">\</span>
+  <span class="nt">-d</span> <span class="s1">'{
+    "reason": "MANUAL_INTERVENTION",
+    "note": "Operator initiated stop from control UI"
+  }'</span>
+</code></pre></div></div>
+
+<p>Supported stop reasons:
+<code class="language-plaintext highlighter-rouge">USER_REQUEST</code>, <code class="language-plaintext highlighter-rouge">TIMEOUT</code>, <code class="language-plaintext highlighter-rouge">POLICY_VIOLATION</code>, <code class="language-plaintext highlighter-rouge">DEPENDENCY_FAILURE</code>, <code class="language-plaintext highlighter-rouge">MANUAL_INTERVENTION</code>, <code class="language-plaintext highlighter-rouge">UNKNOWN</code>.</p>
+
+<p>Optimistic concurrency for lifecycle actions:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">stop</code>, <code class="language-plaintext highlighter-rouge">resume</code>, and <code class="language-plaintext highlighter-rouge">delete</code> accept <code class="language-plaintext highlighter-rouge">If-Match</code> version header</li>
+  <li><code class="language-plaintext highlighter-rouge">stop</code> and <code class="language-plaintext highlighter-rouge">resume</code> also accept body field <code class="language-plaintext highlighter-rouge">expectedVersion</code></li>
+  <li>mismatch returns <code class="language-plaintext highlighter-rouge">409</code> with <code class="language-plaintext highlighter-rouge">errorCode: EXECUTION_VERSION_CONFLICT</code></li>
+</ul>
+
+<p>Get execution timeline/events:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/executions/{executionId}/events"</span>
+</code></pre></div></div>
+
+<p>The standalone runtime records engine events (including node-level events such as node scheduled/started/completed/failed) and lifecycle actions (resume/stop/delete) in the same timeline stream.
+Execution timeline now also includes <code class="language-plaintext highlighter-rouge">EXECUTION_QUEUED</code> followed by <code class="language-plaintext highlighter-rouge">EXECUTION_STARTED</code> for each accepted run.</p>
+
+<p>Lifecycle errors use a standardized payload:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"errorCode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"EXECUTION_INVALID_TRANSITION"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Invalid execution status transition"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"httpStatus"</span><span class="p">:</span><span class="w"> </span><span class="mi">409</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"retryable"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"timestamp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-03-07T00:20:00Z"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"details"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"executionId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"run_abc123"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"fromStatus"</span><span class="p">:</span><span class="w"> </span><span class="s2">"STOPPED"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"toStatus"</span><span class="p">:</span><span class="w"> </span><span class="s2">"RUNNING"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>For retryable lifecycle errors, API also includes:</p>
+
+<ul>
+  <li>response header <code class="language-plaintext highlighter-rouge">Retry-After</code></li>
+  <li>payload field <code class="language-plaintext highlighter-rouge">retryAfterSeconds</code></li>
+</ul>
+
+<p>Default value is controlled by runtime property:
+<code class="language-plaintext highlighter-rouge">wayang.runtime.standalone.execution.retry-after-seconds</code> (default <code class="language-plaintext highlighter-rouge">2</code>).</p>
+
+<p>Delete an execution record:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-X</span> DELETE <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/executions/{executionId}"</span>
+</code></pre></div></div>
+
+<p>Resume a paused/waiting execution (for HITL task):</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-X</span> POST <span class="s2">"http://localhost:31713/api/v1/projects/{projectId}/executions/{executionId}/resume"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"accept: application/json"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span> <span class="se">\</span>
+  <span class="nt">-d</span> <span class="s1">'{
+    "humanTaskId": "task_123",
+    "data": {
+      "approved": true,
+      "comment": "continue"
+    }
+  }'</span>
+</code></pre></div></div>
+
+<p>For node-level pause/resume, use HITL nodes (for example <code class="language-plaintext highlighter-rouge">hitl-human-task</code>) in the workflow where you want execution to wait for manual continuation.</p>
+
+<p>Execution lifecycle transitions are validated server-side. Invalid transitions return <code class="language-plaintext highlighter-rouge">409 Conflict</code> with <code class="language-plaintext highlighter-rouge">fromStatus</code> and <code class="language-plaintext highlighter-rouge">toStatus</code> in the response body (for example, <code class="language-plaintext highlighter-rouge">STOPPED -&gt; RUNNING</code> resume attempts).</p>
+
+<h3 id="hitl-behavior-and-execution-flow">HITL Behavior and Execution Flow</h3>
+
+<p>See the dedicated guide: <a href="./hitl">HITL Execution Flow</a>.</p>
+
+<p>Execution metadata for standalone mode is persisted at:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>~/.wayang/logs/server/cloud-project-executions.json
+</code></pre></div></div>
+
+<p>Execution event timeline for standalone mode is persisted at:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>~/.wayang/logs/server/cloud-project-execution-events.json
+</code></pre></div></div>
+
+<h3 id="execute-from-wayang-kulit-ui">Execute From Wayang Kulit UI</h3>
+
+<p>For full desktop usage flow (project lifecycle, execute/retry, failure focus, logs, and shortcuts), see:</p>
+
+<ul>
+  <li><a href="./designer-user-guide">Wayang Kulit User Guide</a></li>
+</ul>
+
+<p>Tip: to add a manual pause point quickly, right-click a node and choose <code class="language-plaintext highlighter-rouge">Insert HITL Checkpoint</code>.<br />
+This inserts a <code class="language-plaintext highlighter-rouge">hitl-human-task</code> checkpoint after that node and rewires outgoing edges through it.</p>
+
+<p>Project metadata is persisted at:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>~/.wayang/logs/server/cloud-projects.json
+</code></pre></div></div>
+
+<h3 id="rag-api-standalone">RAG API (Standalone)</h3>
+
+<p>See the dedicated guide: <a href="./rag">RAG API</a>.</p>
+
+<h3 id="standalone-api-routing-note">Standalone API Routing Note</h3>
+
+<p>See the dedicated guide: <a href="./standalone-troubleshooting">Standalone Troubleshooting</a>.</p>
+
+<h3 id="troubleshooting-standalone-startup">Troubleshooting (Standalone Startup)</h3>
+
+<p>See the dedicated guide: <a href="./standalone-troubleshooting">Standalone Troubleshooting</a>.</p>
+
+<hr />
+
+<h2 id="mcp-api-test-coverage">MCP API Test Coverage</h2>
+
+<p>See the dedicated guide: <a href="./mcp">MCP API Coverage</a>.</p>
+
+<hr />
+
+<h2 id="trigger-and-hitl-test-coverage">Trigger and HITL Test Coverage</h2>
+
+<p>See the dedicated guide: <a href="./testing-coverage">Testing Coverage</a>.</p>
+
+<hr />
+
+<h2 id="advanced-topics">Advanced Topics</h2>
+
+<h3 id="multi-agent-collaboration">Multi-Agent Collaboration</h3>
+
+<p>Design workflows where multiple agents work together:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">workflow</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">Content Pipeline</span>
+  
+  <span class="na">agents</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">id</span><span class="pi">:</span> <span class="s">researcher</span>
+      <span class="na">prompt</span><span class="pi">:</span> <span class="s2">"</span><span class="s">Research</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">topic</span><span class="nv"> </span><span class="s">thoroughly."</span>
+    
+    <span class="pi">-</span> <span class="na">id</span><span class="pi">:</span> <span class="s">writer</span>
+      <span class="na">prompt</span><span class="pi">:</span> <span class="s2">"</span><span class="s">Write</span><span class="nv"> </span><span class="s">an</span><span class="nv"> </span><span class="s">engaging</span><span class="nv"> </span><span class="s">article</span><span class="nv"> </span><span class="s">based</span><span class="nv"> </span><span class="s">on</span><span class="nv"> </span><span class="s">research."</span>
+    
+    <span class="pi">-</span> <span class="na">id</span><span class="pi">:</span> <span class="s">editor</span>
+      <span class="na">prompt</span><span class="pi">:</span> <span class="s2">"</span><span class="s">Review</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">improve</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">content."</span>
+  
+  <span class="na">flow</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">researcher</span>
+    <span class="pi">-</span> <span class="na">writer (depends_on</span><span class="pi">:</span> <span class="s">researcher)</span>
+    <span class="pi">-</span> <span class="na">editor (depends_on</span><span class="pi">:</span> <span class="s">writer)</span>
+    <span class="pi">-</span> <span class="na">end (depends_on</span><span class="pi">:</span> <span class="s">editor)</span>
+</code></pre></div></div>
+
+<h3 id="custom-agents">Custom Agents</h3>
+
+<p>Create specialized agents for your use case:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// agents/customer-support.js</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="na">name</span><span class="p">:</span> <span class="dl">'</span><span class="s1">customer-support</span><span class="dl">'</span><span class="p">,</span>
+  
+  <span class="k">async</span> <span class="nf">execute</span><span class="p">(</span><span class="nx">context</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="p">{</span> <span class="nx">message</span><span class="p">,</span> <span class="nx">history</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">context</span><span class="p">;</span>
+    
+    <span class="c1">// Analyze sentiment</span>
+    <span class="kd">const</span> <span class="nx">sentiment</span> <span class="o">=</span> <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nf">analyzeSentiment</span><span class="p">(</span><span class="nx">message</span><span class="p">);</span>
+    
+    <span class="c1">// Route based on urgency</span>
+    <span class="k">if </span><span class="p">(</span><span class="nx">sentiment</span><span class="p">.</span><span class="nx">urgency</span> <span class="o">&gt;</span> <span class="mf">0.8</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="p">{</span> <span class="na">escalate</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="na">reason</span><span class="p">:</span> <span class="dl">'</span><span class="s1">High urgency detected</span><span class="dl">'</span> <span class="p">};</span>
+    <span class="p">}</span>
+    
+    <span class="c1">// Generate response</span>
+    <span class="kd">const</span> <span class="nx">response</span> <span class="o">=</span> <span class="k">await</span> <span class="k">this</span><span class="p">.</span><span class="nf">generateResponse</span><span class="p">(</span><span class="nx">message</span><span class="p">,</span> <span class="nx">history</span><span class="p">);</span>
+    
+    <span class="k">return</span> <span class="p">{</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">sentiment</span> <span class="p">};</span>
+  <span class="p">},</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<h3 id="error-handling">Error Handling</h3>
+
+<p>Implement robust error handling in your workflows:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">workflow</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">Resilient Workflow</span>
+  
+  <span class="na">agents</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">id</span><span class="pi">:</span> <span class="s">main</span>
+      <span class="na">on_error</span><span class="pi">:</span>
+        <span class="na">retry</span><span class="pi">:</span> <span class="m">3</span>
+        <span class="na">fallback</span><span class="pi">:</span> <span class="s">backup_agent</span>
+  
+  <span class="na">execution</span><span class="pi">:</span>
+    <span class="na">timeout</span><span class="pi">:</span> <span class="m">60000</span>
+    <span class="na">on_timeout</span><span class="pi">:</span>
+      <span class="na">notify</span><span class="pi">:</span> <span class="s">slack</span>
+      <span class="na">action</span><span class="pi">:</span> <span class="s">escalate</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="api-reference-1">API Reference</h2>
+
+<h3 id="rest-api">REST API</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Start a workflow execution</span>
+curl <span class="nt">-X</span> POST https://api.wayang.ai/v1/executions <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"Authorization: Bearer </span><span class="nv">$WAYANG_API_KEY</span><span class="s2">"</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span> <span class="se">\</span>
+  <span class="nt">-d</span> <span class="s1">'{"workflow": "my-workflow", "input": {"key": "value"}}'</span>
+
+<span class="c"># Get execution status</span>
+curl https://api.wayang.ai/v1/executions/<span class="o">{</span>execution_id<span class="o">}</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"Authorization: Bearer </span><span class="nv">$WAYANG_API_KEY</span><span class="s2">"</span>
+</code></pre></div></div>
+
+<h3 id="sdk-usage">SDK Usage</h3>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">WayangClient</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@wayang-ai/sdk</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">client</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">WayangClient</span><span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">WAYANG_API_KEY</span><span class="p">);</span>
+
+<span class="c1">// Execute a workflow</span>
+<span class="kd">const</span> <span class="nx">execution</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">client</span><span class="p">.</span><span class="nf">execute</span><span class="p">(</span><span class="dl">'</span><span class="s1">my-workflow</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+  <span class="na">input</span><span class="p">:</span> <span class="p">{</span> <span class="na">topic</span><span class="p">:</span> <span class="dl">'</span><span class="s1">AI Agents</span><span class="dl">'</span> <span class="p">},</span>
+<span class="p">});</span>
+
+<span class="c1">// Wait for completion</span>
+<span class="kd">const</span> <span class="nx">result</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">execution</span><span class="p">.</span><span class="nf">waitForCompletion</span><span class="p">();</span>
+<span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">output</span><span class="p">);</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+
+<h3 id="common-issues">Common Issues</h3>
+
+<p><strong>Agent not responding</strong></p>
+<ul>
+  <li>Check API key configuration</li>
+  <li>Verify model availability</li>
+  <li>Review rate limits</li>
+</ul>
+
+<p><strong>Workflow fails to start</strong></p>
+<ul>
+  <li>Validate YAML syntax</li>
+  <li>Check agent definitions</li>
+  <li>Ensure all dependencies are installed</li>
+</ul>
+
+<p><strong>Slow execution</strong></p>
+<ul>
+  <li>Enable parallel processing</li>
+  <li>Optimize agent prompts</li>
+  <li>Consider caching responses</li>
+</ul>
+
+<hr />
+
+<h2 id="need-help">Need Help?</h2>
+
+<ul>
+  <li>📚 <a href="https://docs.wayang.ai">Full Documentation</a></li>
+  <li>💬 <a href="https://discord.gg/wayang-ai">Community Discord</a></li>
+  <li>🐛 <a href="https://github.com/wayang-ai/wayang-platform/issues">Report an Issue</a></li>
+  <li>📝 <a href="https://github.com/wayang-ai/examples">Examples Repository</a></li>
+</ul>
+
+<hr />
+
+<p><a href="/">Back to Home</a>   <a href="/features/">View Features</a></p>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>Wayang AI Docs</span>
+      <a href="https://github.com/wayang-ai/wayang-platform">wayang-ai/wayang-platform</a>
+    </div>
+  </footer>
+</body>
+</html>

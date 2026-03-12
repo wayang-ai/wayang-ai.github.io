@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wayang Assistant | Wayang AI</title>
+  <meta name="description" content="Wayang AI documentation and platform guides for building agentic workflows.">
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('wayang-theme');
+        var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        var theme = stored || (prefersLight ? 'light' : 'dark');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <div class="site-bg" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand">Wayang AI</a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="/docs/">Docs</a>
+        <a href="/docs/javadoc">Javadoc</a>
+        <a href="/features/">Features</a>
+        <a href="/about/">About</a>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme">Theme</button>
+        <a href="https://github.com/wayang-ai/wayang-platform">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container content-shell">
+    <h1 id="wayang-assistant">Wayang Assistant</h1>
+
+<p>Wayang Assistant is an AI-powered helper for building Wayang projects, answering questions about Wayang, and troubleshooting errors. It uses the official documentation and optional web search to provide up-to-date guidance.</p>
+
+<hr />
+
+<h2 id="what-it-does">What It Does</h2>
+
+<ul>
+  <li><strong>Ask About Wayang</strong>: Get answers on capabilities, architecture, schemas, and usage.</li>
+  <li><strong>Generate Projects</strong>: Describe intent in natural language and receive a ready-to-use Wayang project structure.</li>
+  <li><strong>Troubleshoot Errors</strong>: Submit error messages and receive step-by-step fixes with references using the internal knowledge base.</li>
+  <li><strong>Interactive Chat</strong>: Maintain stateful conversations with session support.</li>
+</ul>
+
+<hr />
+
+<h2 id="api-endpoints">API Endpoints</h2>
+
+<p>Base path: <code class="language-plaintext highlighter-rouge">/api/v1/assistant</code></p>
+
+<h3 id="interactive-chat-recommended">Interactive Chat (Recommended)</h3>
+
+<p>Wayang Assistant supports stateful chat sessions with history and document retrieval (RAG).</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-X</span> POST http://localhost:31713/api/v1/assistant/chat <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span> <span class="se">\</span>
+  <span class="nt">-d</span> <span class="s1">'{
+    "sessionId": "user-session-123",
+    "message": "How do I build a RAG workflow in Wayang?"
+  }'</span>
+</code></pre></div></div>
+
+<p>The response includes:</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">reply</code>: The assistant’s text response.</li>
+  <li><code class="language-plaintext highlighter-rouge">relevantDocs</code>: A list of referenced documents with score, title, and URL.</li>
+  <li><code class="language-plaintext highlighter-rouge">history</code>: Previous conversation turns.</li>
+</ul>
+
+<h3 id="ask-a-question-stateless">Ask a question (Stateless)</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-X</span> POST http://localhost:31713/api/v1/assistant/ask <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s1">'Content-Type: application/json'</span> <span class="se">\</span>
+  <span class="nt">-d</span> <span class="s1">'{
+    "question": "How does WayangSpec relate to WorkflowSpec?"
+  }'</span>
+</code></pre></div></div>
+
+<h3 id="troubleshoot-an-error">Troubleshoot an error</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-X</span> POST http://localhost:31713/api/v1/assistant/troubleshoot <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s1">'Content-Type: application/json'</span> <span class="se">\</span>
+  <span class="nt">-d</span> <span class="s1">'{
+    "errorMessage": "Unsatisfied dependency for type ControlPlaneExecutorRegistry"
+  }'</span>
+</code></pre></div></div>
+
+<h3 id="capabilities">Capabilities</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl http://localhost:31713/api/v1/assistant/capabilities
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="configuration">Configuration</h2>
+
+<p>Wayang Assistant is optimized for internal usage with high-performance local inference.</p>
+
+<p>Add or override in <code class="language-plaintext highlighter-rouge">application.properties</code>:</p>
+
+<div class="language-properties highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Default Model Configuration
+</span><span class="py">gollek.models.default-model</span><span class="p">=</span><span class="s">Qwen/Qwen2.5-0.5B-Instruct</span>
+<span class="py">gollek.models.default-provider</span><span class="p">=</span><span class="s">gguf</span>
+<span class="py">gollek.models.auto-download-enabled</span><span class="p">=</span><span class="s">true</span>
+
+<span class="c"># Assistant Parameters
+</span><span class="py">wayang.assistant.max-doc-results</span><span class="p">=</span><span class="s">10</span>
+<span class="py">wayang.assistant.max-web-results</span><span class="p">=</span><span class="s">5</span>
+</code></pre></div></div>
+
+<h3 id="local-model-weights">Local Model Weights</h3>
+<p>By default, the assistant will automatically download weights from Hugging Face if not found in the local cache (<code class="language-plaintext highlighter-rouge">~/.wayang/models</code> or as configured).</p>
+
+<hr />
+
+<h2 id="runtime-support">Runtime Support</h2>
+
+<p>The Wayang Assistant and its underlying inference engine (Gollek) are built for <strong>Java 25</strong> and <strong>Quarkus 3.32.2+</strong>, ensuring compatibility with modern JVM features.</p>
+
+<hr />
+
+<h2 id="notes">Notes</h2>
+
+<ul>
+  <li>The assistant relies on official docs (<code class="language-plaintext highlighter-rouge">wayang.github.io</code>) and local source code metadata for authoritative answers.</li>
+  <li>For air-gapped deployments, pre-load the model weights and disable auto-download (<code class="language-plaintext highlighter-rouge">gollek.models.auto-download-enabled=false</code>).</li>
+</ul>
+
+<hr />
+
+<h2 id="related">Related</h2>
+
+<ul>
+  <li><a href="./schema-catalog">Schema Catalog and WayangSpec</a></li>
+  <li><a href="./projects-api">Projects API</a></li>
+  <li><a href="./standalone-troubleshooting">Standalone Troubleshooting</a></li>
+</ul>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>Wayang AI Docs</span>
+      <a href="https://github.com/wayang-ai/wayang-platform">wayang-ai/wayang-platform</a>
+    </div>
+  </footer>
+</body>
+</html>
