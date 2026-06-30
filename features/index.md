@@ -39,6 +39,7 @@ High-performance runtime for reliable workflow execution.
 - **Error Handling** - Built-in retry logic and graceful failure recovery
 - **State Management** - Track workflow state across executions
 - **Scalability** - From local development to production clusters
+- **Sandbox Runtime** - Isolated execution with configurable security and resource quotas
 
 ### 🧭 Wayang Assistant
 
@@ -73,6 +74,8 @@ Extend Wayang AI to fit your needs.
 | **Secrets Management** | Secure storage for API keys and credentials |
 | **Team Collaboration** | Shared workspaces, roles, and permissions |
 | **Export/Import** | Share workflows as portable JSON configurations |
+| **Sandbox Execution** | Isolated workflow execution with security policies and resource quotas |
+| **Multi-Tenancy** | Tenant-scoped sandboxes with complete isolation |
 
 ---
 

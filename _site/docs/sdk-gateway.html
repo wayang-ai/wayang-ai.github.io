@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -19,11 +20,14 @@
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Sora:wght@400;600;700&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/site.css">
   <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
   <script src="/assets/js/site.js" defer></script>
 </head>
+
 <body>
   <div class="site-bg" aria-hidden="true"></div>
 
@@ -32,7 +36,7 @@
       <a href="/" class="brand">Wayang AI</a>
       <nav class="site-nav" aria-label="Main navigation">
         <a href="/docs/">Docs</a>
-        <a href="/docs/javadoc">Javadoc</a>
+        <a href="/javadoc/">Javadoc</a>
         <a href="/features/">Features</a>
         <a href="/about/">About</a>
         <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme">Theme</button>
@@ -44,48 +48,73 @@
   <main class="container content-shell">
     <h1 id="gollek-sdk-gateway--spi">Gollek SDK Gateway &amp; SPI</h1>
 
-<p>Wayang AI’s core inference engine relies on the <strong>Gollek SDK</strong>, a unified facade and SPI (Service Provider Interface) that connects Wayang to virtually any generative AI or embedded execution model.</p>
+    <p>Wayang AI’s core inference engine relies on the <strong>Gollek SDK</strong>, a unified facade and SPI (Service
+      Provider Interface) that connects Wayang to virtually any generative AI or embedded execution model.</p>
 
-<hr />
+    <hr />
 
-<h2 id="-the-gollek-sdk-spi-architecture">🔌 The <code class="language-plaintext highlighter-rouge">gollek-sdk</code> SPI Architecture</h2>
+    <h2 id="-the-gollek-sdk-spi-architecture">🔌 The <code
+        class="language-plaintext highlighter-rouge">gollek-sdk</code> SPI Architecture</h2>
 
-<p>Wayang decoupled from hardcoded dependency modules entirely, instead wiring its engine up only to <code class="language-plaintext highlighter-rouge">tech.kayys.gollek:gollek-sdk</code>.</p>
+    <p>Wayang decoupled from hardcoded dependency modules entirely, instead wiring its engine up only to <code
+        class="language-plaintext highlighter-rouge">tech.kayys.gollek:gollek-sdk</code>.</p>
 
-<p>The SDK acts as an ecosystem bridge, enabling:</p>
-<ul>
-  <li><strong>Dynamic Provider Discovery</strong>: Local runtime JVMs discover supported models via ServiceLoaders (e.g., picking up <code class="language-plaintext highlighter-rouge">OpenAIProvider</code>, <code class="language-plaintext highlighter-rouge">AnthropicProvider</code>, <code class="language-plaintext highlighter-rouge">OllamaProvider</code>).</li>
-  <li><strong>Unified DTOs</strong>: Consistent data transfer patterns (<code class="language-plaintext highlighter-rouge">InferenceRequest</code>, <code class="language-plaintext highlighter-rouge">Message</code>, <code class="language-plaintext highlighter-rouge">ToolCall</code>) regardless of the underlying LLM protocol quirks.</li>
-  <li><strong>MCP Server Discovery</strong>: Connects the inference engine with embedded or remote Model Context Protocol (MCP) servers seamlessly.</li>
-</ul>
+    <p>The SDK acts as an ecosystem bridge, enabling:</p>
+    <ul>
+      <li><strong>Dynamic Provider Discovery</strong>: Local runtime JVMs discover supported models via ServiceLoaders
+        (e.g., picking up <code class="language-plaintext highlighter-rouge">OpenAIProvider</code>, <code
+          class="language-plaintext highlighter-rouge">AnthropicProvider</code>, <code
+          class="language-plaintext highlighter-rouge">OllamaProvider</code>).</li>
+      <li><strong>Unified DTOs</strong>: Consistent data transfer patterns (<code
+          class="language-plaintext highlighter-rouge">InferenceRequest</code>, <code
+          class="language-plaintext highlighter-rouge">Message</code>, <code
+          class="language-plaintext highlighter-rouge">ToolCall</code>) regardless of the underlying LLM protocol
+        quirks.</li>
+      <li><strong>MCP Server Discovery</strong>: Connects the inference engine with embedded or remote Model Context
+        Protocol (MCP) servers seamlessly.</li>
+    </ul>
 
-<h3 id="example-gollek-sdk-provider-registration-via-cdi">Example: Gollek SDK Provider Registration via CDI</h3>
-<p>Wayang’s internal <code class="language-plaintext highlighter-rouge">GollekSdkProducer</code> handles SDK instantiation efficiently at boot through standard Quarkus configurations:</p>
+    <h3 id="example-gollek-sdk-provider-registration-via-cdi">Example: Gollek SDK Provider Registration via CDI</h3>
+    <p>Wayang’s internal <code class="language-plaintext highlighter-rouge">GollekSdkProducer</code> handles SDK
+      instantiation efficiently at boot through standard Quarkus configurations:</p>
 
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Produces</span>
+    <div class="language-java highlighter-rouge">
+      <div class="highlight">
+        <pre class="highlight"><code><span class="nd">@Produces</span>
 <span class="nd">@ApplicationScoped</span>
 <span class="kd">public</span> <span class="nc">GollekSdk</span> <span class="nf">produceGollekSdk</span><span class="o">()</span> <span class="o">{</span>
     <span class="k">return</span> <span class="nc">GollekSdk</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>
             <span class="c1">// Customizes configuration hooks...</span>
             <span class="o">.</span><span class="na">build</span><span class="o">();</span>
 <span class="o">}</span>
-</code></pre></div></div>
+</code></pre>
+      </div>
+    </div>
 
-<hr />
+    <hr />
 
-<h2 id="-streaming--chunk-delegation">🚀 Streaming &amp; Chunk Delegation</h2>
+    <h2 id="-streaming--chunk-delegation">🚀 Streaming &amp; Chunk Delegation</h2>
 
-<p>One of the largest benefits of moving inference generation through <code class="language-plaintext highlighter-rouge">gollek-sdk</code> is high-performance streaming. Through the SDK’s <code class="language-plaintext highlighter-rouge">inferStream</code> method, Wayang’s <code class="language-plaintext highlighter-rouge">SkillBasedAgentExecutor</code> handles generative streams natively.</p>
+    <p>One of the largest benefits of moving inference generation through <code
+        class="language-plaintext highlighter-rouge">gollek-sdk</code> is high-performance streaming. Through the SDK’s
+      <code class="language-plaintext highlighter-rouge">inferStream</code> method, Wayang’s <code
+        class="language-plaintext highlighter-rouge">SkillBasedAgentExecutor</code> handles generative streams natively.
+    </p>
 
-<p>Rather than waiting for the entire loop to finish sequentially, Wayang’s agent API can surface <code class="language-plaintext highlighter-rouge">StreamChunk</code> emissions up to the end-users instantly, creating responsive front-end experiences out-of-the-box.</p>
+    <p>Rather than waiting for the entire loop to finish sequentially, Wayang’s agent API can surface <code
+        class="language-plaintext highlighter-rouge">InferenceChunk</code> emissions up to the end-users instantly,
+      creating responsive front-end experiences out-of-the-box.</p>
 
-<hr />
+    <hr />
 
-<h2 id="-model-context-protocol-mcp">🧩 Model Context Protocol (MCP)</h2>
+    <h2 id="-model-context-protocol-mcp">🧩 Model Context Protocol (MCP)</h2>
 
-<p><code class="language-plaintext highlighter-rouge">gollek-sdk</code> natively bridges to standard Model Context Protocol servers. This means an agent can discover system-level tools, read local file systems, connect to remote GitHub actions, or search Slack.</p>
+    <p><code class="language-plaintext highlighter-rouge">gollek-sdk</code> natively bridges to standard Model Context
+      Protocol servers. This means an agent can discover system-level tools, read local file systems, connect to remote
+      GitHub actions, or search Slack.</p>
 
-<p>Wayang connects through <code class="language-plaintext highlighter-rouge">McpRegistryManager</code> during inference setup, enriching the prompt injection loop seamlessly!</p>
+    <p>Wayang connects through <code class="language-plaintext highlighter-rouge">McpRegistryManager</code> during
+      inference setup, enriching the prompt injection loop seamlessly!</p>
 
   </main>
 
@@ -94,6 +123,565 @@
       <span>Wayang AI Docs</span>
       <a href="https://github.com/wayang-ai/wayang-platform">wayang-ai/wayang-platform</a>
     </div>
+    <div class="container footer-links">
+      <a href="/cookies-policy.html">Cookies Policy</a>
+      <a href="/privacy-policy.html">Privacy Policy</a>
+      <a href="/terms-of-service.html">Terms of Service</a>
+    </div>
   </footer>
+
+  <!-- Cookie Consent Banner -->
+  <div id="cookie-consent-banner" class="cookie-consent-banner" style="display: none;">
+    <div class="cookie-consent-content">
+      <div class="cookie-consent-text">
+        <h3>🍪 We Use Cookies</h3>
+        <p>
+          We use cookies to enhance your browsing experience, analyze site traffic, and personalize content.
+          By continuing to use this site, you consent to our use of cookies.
+        </p>
+        <p class="cookie-consent-link">
+          <a href="/cookies-policy.html">Learn more</a> about our cookies policy.
+        </p>
+      </div>
+      <div class="cookie-consent-buttons">
+        <button id="cookie-reject" class="btn-cookie-reject">Reject Non-Essential</button>
+        <button id="cookie-customize" class="btn-cookie-customize">Customize</button>
+        <button id="cookie-accept" class="btn-cookie-accept">Accept All</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cookie Preferences Modal -->
+  <div id="cookie-preferences-modal" class="cookie-modal" style="display: none;">
+    <div class="cookie-modal-content">
+      <div class="cookie-modal-header">
+        <h2>Cookie Preferences</h2>
+        <button id="cookie-modal-close" class="cookie-modal-close">&times;</button>
+      </div>
+      <div class="cookie-modal-body">
+        <p class="cookie-modal-description">
+          Manage your cookie preferences below. Note that essential cookies cannot be disabled
+          as they are necessary for the site to function properly.
+        </p>
+
+        <div class="cookie-category">
+          <div class="cookie-category-header">
+            <div class="cookie-category-info">
+              <h4>Essential Cookies</h4>
+              <p>Required for basic site functionality and security</p>
+            </div>
+            <div class="cookie-category-toggle">
+              <input type="checkbox" id="cookie-essential" checked disabled>
+              <label for="cookie-essential" class="cookie-toggle-label">Always Active</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="cookie-category">
+          <div class="cookie-category-header">
+            <div class="cookie-category-info">
+              <h4>Performance & Analytics Cookies</h4>
+              <p>Help us understand how visitors use our site</p>
+            </div>
+            <div class="cookie-category-toggle">
+              <input type="checkbox" id="cookie-analytics">
+              <label for="cookie-analytics" class="cookie-toggle-label"></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="cookie-category">
+          <div class="cookie-category-header">
+            <div class="cookie-category-info">
+              <h4>Functionality Cookies</h4>
+              <p>Remember your preferences and settings</p>
+            </div>
+            <div class="cookie-category-toggle">
+              <input type="checkbox" id="cookie-functionality">
+              <label for="cookie-functionality" class="cookie-toggle-label"></label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cookie-modal-footer">
+        <button id="cookie-save-preferences" class="btn-cookie-save">Save Preferences</button>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    /* Cookie Consent Banner Styles */
+    .cookie-consent-banner {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: #ffffff;
+      padding: 1.5rem 2rem;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+      z-index: 9999;
+      border-top: 3px solid #0f3460;
+      animation: slideUp 0.3s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(100%);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .cookie-consent-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .cookie-consent-text {
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .cookie-consent-text h3 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.25rem;
+      color: #e94560;
+      font-weight: 600;
+    }
+
+    .cookie-consent-text p {
+      margin: 0.5rem 0;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #e0e0e0;
+    }
+
+    .cookie-consent-link a {
+      color: #0f3460;
+      background: #e94560;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .cookie-consent-link a:hover {
+      background: #ff6b6b;
+    }
+
+    .cookie-consent-buttons {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .cookie-consent-buttons button {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-cookie-accept {
+      background: #e94560;
+      color: white;
+    }
+
+    .btn-cookie-accept:hover {
+      background: #ff6b6b;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(233, 69, 96, 0.4);
+    }
+
+    .btn-cookie-reject {
+      background: transparent;
+      color: #e0e0e0;
+      border: 2px solid #e0e0e0;
+    }
+
+    .btn-cookie-reject:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .btn-cookie-customize {
+      background: #0f3460;
+      color: white;
+    }
+
+    .btn-cookie-customize:hover {
+      background: #1a4a7a;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(15, 52, 96, 0.4);
+    }
+
+    /* Cookie Modal Styles */
+    .cookie-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    .cookie-modal-content {
+      background: white;
+      border-radius: 12px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: modalSlideIn 0.3s ease-out;
+    }
+
+    @keyframes modalSlideIn {
+      from {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .cookie-modal-header {
+      padding: 1.5rem 2rem;
+      border-bottom: 2px solid #e0e0e0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: white;
+      border-radius: 12px 12px 0 0;
+    }
+
+    .cookie-modal-header h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      color: #e94560;
+    }
+
+    .cookie-modal-close {
+      background: none;
+      border: none;
+      font-size: 2rem;
+      color: #e0e0e0;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.2s;
+    }
+
+    .cookie-modal-close:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+
+    .cookie-modal-body {
+      padding: 2rem;
+    }
+
+    .cookie-modal-description {
+      margin-bottom: 1.5rem;
+      color: #555;
+      line-height: 1.6;
+    }
+
+    .cookie-category {
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+
+    .cookie-category:hover {
+      border-color: #0f3460;
+    }
+
+    .cookie-category-header {
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      background: #f8f9fa;
+    }
+
+    .cookie-category-info h4 {
+      margin: 0 0 0.25rem 0;
+      color: #1a1a2e;
+      font-size: 1rem;
+    }
+
+    .cookie-category-info p {
+      margin: 0;
+      color: #666;
+      font-size: 0.85rem;
+    }
+
+    .cookie-category-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .cookie-category-toggle input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      accent-color: #e94560;
+    }
+
+    .cookie-category-toggle input:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .cookie-toggle-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #e94560;
+      cursor: pointer;
+    }
+
+    .cookie-modal-footer {
+      padding: 1.5rem 2rem;
+      border-top: 2px solid #e0e0e0;
+      background: #f8f9fa;
+      border-radius: 0 0 12px 12px;
+      text-align: right;
+    }
+
+    .btn-cookie-save {
+      padding: 0.75rem 2rem;
+      background: #e94560;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-cookie-save:hover {
+      background: #ff6b6b;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(233, 69, 96, 0.4);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .cookie-consent-content {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .cookie-consent-buttons {
+        justify-content: center;
+        width: 100%;
+      }
+
+      .cookie-consent-buttons button {
+        flex: 1;
+        min-width: 120px;
+      }
+
+      .cookie-modal-content {
+        width: 95%;
+        max-height: 90vh;
+      }
+
+      .cookie-category-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+
+  <script>
+    // Cookie Consent Management
+    (function () {
+      const COOKIE_CONSENT_KEY = 'wayang_cookie_consent';
+      const COOKIE_VERSION = '1.0';
+
+      // DOM Elements
+      const banner = document.getElementById('cookie-consent-banner');
+      const modal = document.getElementById('cookie-preferences-modal');
+      const acceptBtn = document.getElementById('cookie-accept');
+      const rejectBtn = document.getElementById('cookie-reject');
+      const customizeBtn = document.getElementById('cookie-customize');
+      const modalClose = document.getElementById('cookie-modal-close');
+      const savePrefsBtn = document.getElementById('cookie-save-preferences');
+      const analyticsCheckbox = document.getElementById('cookie-analytics');
+      const functionalityCheckbox = document.getElementById('cookie-functionality');
+
+      // Check if consent already given
+      function getConsent() {
+        const consent = localStorage.getItem(COOKIE_CONSENT_KEY);
+        return consent ? JSON.parse(consent) : null;
+      }
+
+      // Save consent preferences
+      function saveConsent(preferences) {
+        const consent = {
+          version: COOKIE_VERSION,
+          timestamp: new Date().toISOString(),
+          preferences: preferences
+        };
+        localStorage.setItem(COOKIE_CONSENT_KEY, JSON.stringify(consent));
+
+        // Apply cookie settings
+        applyCookieSettings(preferences);
+      }
+
+      // Apply cookie settings
+      function applyCookieSettings(preferences) {
+        // Analytics cookies
+        if (!preferences.analytics) {
+          // Disable Google Analytics if rejected
+          if (window.ga) {
+            window.ga('set', 'anonymizeIp', true);
+            window.gaOptout = true;
+          }
+        }
+
+        // Functionality cookies
+        if (!preferences.functionality) {
+          // Clear functionality cookies
+          document.cookie.split(";").forEach(function (c) {
+            if (c.trim().startsWith('_preferred_') || c.trim().startsWith('_theme_')) {
+              document.cookie = c.split("=")[0] + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+            }
+          });
+        }
+      }
+
+      // Show banner if no consent
+      function showBanner() {
+        const consent = getConsent();
+        if (!consent) {
+          setTimeout(function () {
+            banner.style.display = 'block';
+          }, 1000);
+        }
+      }
+
+      // Show modal
+      function showModal() {
+        const consent = getConsent();
+        if (consent) {
+          analyticsCheckbox.checked = consent.preferences.analytics || false;
+          functionalityCheckbox.checked = consent.preferences.functionality || false;
+        }
+        modal.style.display = 'flex';
+      }
+
+      // Hide modal
+      function hideModal() {
+        modal.style.display = 'none';
+      }
+
+      // Accept all cookies
+      acceptBtn.addEventListener('click', function () {
+        saveConsent({
+          essential: true,
+          analytics: true,
+          functionality: true
+        });
+        banner.style.display = 'none';
+      });
+
+      // Reject non-essential cookies
+      rejectBtn.addEventListener('click', function () {
+        saveConsent({
+          essential: true,
+          analytics: false,
+          functionality: false
+        });
+        banner.style.display = 'none';
+      });
+
+      // Customize cookies
+      customizeBtn.addEventListener('click', function () {
+        showModal();
+      });
+
+      // Close modal
+      modalClose.addEventListener('click', hideModal);
+
+      // Save preferences
+      savePrefsBtn.addEventListener('click', function () {
+        saveConsent({
+          essential: true,
+          analytics: analyticsCheckbox.checked,
+          functionality: functionalityCheckbox.checked
+        });
+        hideModal();
+        banner.style.display = 'none';
+      });
+
+      // Close modal on outside click
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal) {
+          hideModal();
+        }
+      });
+
+      // Keyboard navigation
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal.style.display === 'flex') {
+          hideModal();
+        }
+      });
+
+      // Initialize
+      showBanner();
+
+      // Expose function to reopen preferences
+      window.openCookiePreferences = showModal;
+    })();
+  </script>
+
 </body>
+
 </html>

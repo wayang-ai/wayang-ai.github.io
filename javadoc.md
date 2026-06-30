@@ -23,7 +23,7 @@ The Javadoc is generated as part of the Maven build process and is available as 
 
 ### Online Documentation
 
-Visit the [Javadoc Reference](./javadoc/index.html) to browse the API documentation online.
+Visit the [Javadoc Reference](/javadoc/index.html) to browse the API documentation online.
 
 ### Generate Locally
 
@@ -68,7 +68,7 @@ The generated Javadoc will be available in `website/wayang.github.io/javadoc/`.
 
 ## Troubleshooting
 
-Having issues generating or viewing the Javadoc? See the [Javadoc Troubleshooting Guide](./docs/javadoc-troubleshooting) for solutions to common problems.
+Having issues generating or viewing the Javadoc? See the [Javadoc Troubleshooting Guide](./javadoc-troubleshooting.html) for solutions to common problems.
 
 ### Quick Fixes
 
@@ -80,9 +80,9 @@ Having issues generating or viewing the Javadoc? See the [Javadoc Troubleshootin
 
 ## Related Documentation
 
-- [Projects API Guide](./projects-api)
-- [Schema Catalog](./schema-catalog)
-- [Agent Skills](./agent-skills)
-- [RAG API](./rag)
-- [MCP Integration](./mcp)
-- [Javadoc Troubleshooting](./docs/javadoc-troubleshooting)
+- [Projects API Guide](./projects-api.html)
+- [Schema Catalog](./schema-catalog.html)
+- [Agent Skills](./agent-skills.html)
+- [RAG API](./rag.html)
+- [MCP Integration](./mcp.html)
+- [Javadoc Troubleshooting](./javadoc-troubleshooting.html)

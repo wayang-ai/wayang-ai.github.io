@@ -21,6 +21,17 @@ Get started with Wayang AI and learn how to build powerful AI agent workflows.
 
 ## Deep Dive Guides
 
+### Executors & Integrations
+
+- **[Executor Integrations](./executor-integrations)** - Unified retrieval across Vector, Graph, Memory, and RAG
+- **[Vector Executor](./executors/vector)** - Semantic similarity search with embeddings
+- **[Graph Executor](./executors/graph)** - Relationship-based reasoning and knowledge graphs
+- **[Graph vs Vector](./executors/graph-vs-vector)** - Choosing the right backend
+- **[Gollek Multimodal Integration](./gollek-integration)** - GPU-accelerated inference with streaming
+- **[Sandbox Runtime](./sandbox-runtime)** - Isolated execution environments with security and resource control
+
+### Core Features
+
 - [Agent Skills](./agent-skills)
 - [ReAct Tool Execution](./react-mechanism)
 - [Gollek SDK Gateway & SPI](./sdk-gateway)
@@ -37,6 +48,7 @@ Get started with Wayang AI and learn how to build powerful AI agent workflows.
 - [Guardrails API & Execution](./guardrails)
 - [Execution Telemetry API](./telemetry-api)
 - [Execution Debugger API](./debugger-api)
+- [Sandbox Runtime](./sandbox-runtime) - Isolated execution environments
 - [Standalone Troubleshooting](./standalone-troubleshooting)
 - [Testing Coverage](./testing-coverage)
 
@@ -977,6 +989,14 @@ console.log(result.output);
 - 💬 [Community Discord](https://discord.gg/wayang-ai)
 - 🐛 [Report an Issue](https://github.com/wayang-ai/wayang-platform/issues)
 - 📝 [Examples Repository](https://github.com/wayang-ai/examples)
+
+---
+
+## Legal & Policies
+
+- [Cookies Policy](/cookies-policy.html) - How we use cookies
+- [Privacy Policy](/privacy-policy.html) - Data protection and privacy
+- [Terms of Service](/terms-of-service.html) - Usage terms and conditions
 
 ---
 

@@ -1,0 +1,11 @@
+tech.kayys.wayang.inference.gollek
+tech.kayys.wayang.runtime.standalone
+tech.kayys.wayang.runtime.standalone.config
+tech.kayys.wayang.runtime.standalone.context
+tech.kayys.wayang.runtime.standalone.executor
+tech.kayys.wayang.runtime.standalone.repository
+tech.kayys.wayang.runtime.standalone.resource
+tech.kayys.wayang.runtime.standalone.scheduler
+tech.kayys.wayang.runtime.standalone.security
+tech.kayys.wayang.runtime.standalone.service
+tech.kayys.wayang.runtime.standalone.status

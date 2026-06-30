@@ -1,0 +1,1046 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vector Executor | Wayang AI</title>
+  <meta name="description" content="Wayang AI documentation and platform guides for building agentic workflows.">
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('wayang-theme');
+        var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        var theme = stored || (prefersLight ? 'light' : 'dark');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <div class="site-bg" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand">Wayang AI</a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="/docs/">Docs</a>
+        <a href="/javadoc/">Javadoc</a>
+        <a href="/features/">Features</a>
+        <a href="/about/">About</a>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme">Theme</button>
+        <a href="https://github.com/wayang-ai/wayang-platform">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container content-shell">
+    <h1 id="vector-executor">Vector Executor</h1>
+
+<p>Semantic similarity search using vector embeddings for AI agent memory and RAG.</p>
+
+<hr />
+
+<h2 id="overview">Overview</h2>
+
+<p>The Vector Executor provides dense retrieval capabilities using vector embeddings, enabling semantic search across memories, documents, and knowledge bases.</p>
+
+<hr />
+
+<h2 id="architecture">Architecture</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>┌─────────────────────────────────────────────────────────┐
+│                   Vector Executor                        │
+├─────────────────────────────────────────────────────────┤
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │
+│  │  Embedding   │  │   Vector     │  │   Similarity │  │
+│  │  Generator   │  │   Index      │  │   Search     │  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  │
+└─────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────┐
+│                   Vector Stores                          │
+├──────────────┬──────────────┬──────────────┬───────────┤
+│  In-Memory   │    FAISS     │   PGVector   │  Milvus   │
+└──────────────┴──────────────┴──────────────┴───────────┘
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="supported-backends">Supported Backends</h2>
+
+<h3 id="in-memory-vector-store">In-Memory Vector Store</h3>
+
+<p><strong>Best For:</strong> Development, testing, small datasets (&lt;10K entries)</p>
+
+<div class="language-properties highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="py">wayang.vector.store.type</span><span class="p">=</span><span class="s">inmemory</span>
+</code></pre></div></div>
+
+<p><strong>Features:</strong></p>
+<ul>
+  <li>Fast setup, no external dependencies</li>
+  <li>O(n) search complexity</li>
+  <li>Thread-safe implementation</li>
+</ul>
+
+<hr />
+
+<h3 id="faiss-vector-store">FAISS Vector Store</h3>
+
+<p><strong>Best For:</strong> High-performance production (&gt;1M entries)</p>
+
+<div class="language-properties highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="py">wayang.vector.store.type</span><span class="p">=</span><span class="s">faiss</span>
+<span class="py">wayang.vector.store.faiss.index-type</span><span class="p">=</span><span class="s">HNSW</span>
+<span class="py">wayang.vector.store.faiss.dimension</span><span class="p">=</span><span class="s">768</span>
+</code></pre></div></div>
+
+<p><strong>Features:</strong></p>
+<ul>
+  <li>Approximate Nearest Neighbor search</li>
+  <li>O(log n) complexity</li>
+  <li>GPU acceleration support</li>
+</ul>
+
+<hr />
+
+<h3 id="pgvector-store">PGVector Store</h3>
+
+<p><strong>Best For:</strong> PostgreSQL deployments (&gt;100K entries)</p>
+
+<div class="language-properties highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="py">wayang.vector.store.type</span><span class="p">=</span><span class="s">pgvector</span>
+<span class="py">wayang.vector.store.pgvector.url</span><span class="p">=</span><span class="s">jdbc:postgresql://localhost:5432/wayang</span>
+<span class="py">wayang.vector.store.pgvector.username</span><span class="p">=</span><span class="s">wayang</span>
+<span class="py">wayang.vector.store.pgvector.password</span><span class="p">=</span><span class="s">secret</span>
+</code></pre></div></div>
+
+<p><strong>Features:</strong></p>
+<ul>
+  <li>Integrated with PostgreSQL</li>
+  <li>SQL + vector queries</li>
+  <li>ACID compliance</li>
+</ul>
+
+<hr />
+
+<h3 id="milvus-vector-store">Milvus Vector Store</h3>
+
+<p><strong>Best For:</strong> Large-scale deployments (&gt;10M entries)</p>
+
+<div class="language-properties highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="py">wayang.vector.store.type</span><span class="p">=</span><span class="s">milvus</span>
+<span class="py">wayang.vector.store.milvus.uri</span><span class="p">=</span><span class="s">http://localhost:19530</span>
+</code></pre></div></div>
+
+<p><strong>Features:</strong></p>
+<ul>
+  <li>Distributed architecture</li>
+  <li>Horizontal scaling</li>
+  <li>Multi-modal support</li>
+</ul>
+
+<hr />
+
+<h3 id="qdrant-vector-store">Qdrant Vector Store</h3>
+
+<p><strong>Best For:</strong> Feature-rich production deployments</p>
+
+<div class="language-properties highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="py">wayang.vector.store.type</span><span class="p">=</span><span class="s">qdrant</span>
+<span class="py">wayang.vector.store.qdrant.url</span><span class="p">=</span><span class="s">http://localhost:6333</span>
+</code></pre></div></div>
+
+<p><strong>Features:</strong></p>
+<ul>
+  <li>Rich filtering</li>
+  <li>Payload support</li>
+  <li>REST API</li>
+</ul>
+
+<hr />
+
+<h2 id="usage-examples">Usage Examples</h2>
+
+<h3 id="basic-vector-search">Basic Vector Search</h3>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Inject</span>
+<span class="nc">VectorStore</span> <span class="n">vectorStore</span><span class="o">;</span>
+
+<span class="c1">// Create query</span>
+<span class="nc">VectorQuery</span> <span class="n">query</span> <span class="o">=</span> <span class="nc">VectorQuery</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>
+    <span class="o">.</span><span class="na">query</span><span class="o">(</span><span class="s">"What is machine learning?"</span><span class="o">)</span>
+    <span class="o">.</span><span class="na">topK</span><span class="o">(</span><span class="mi">5</span><span class="o">)</span>
+    <span class="o">.</span><span class="na">threshold</span><span class="o">(</span><span class="mf">0.7</span><span class="o">)</span>
+    <span class="o">.</span><span class="na">build</span><span class="o">();</span>
+
+<span class="c1">// Search</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">VectorEntry</span><span class="o">&gt;</span> <span class="n">results</span> <span class="o">=</span> <span class="n">vectorStore</span><span class="o">.</span><span class="na">search</span><span class="o">(</span><span class="n">query</span><span class="o">);</span>
+
+<span class="n">results</span><span class="o">.</span><span class="na">forEach</span><span class="o">(</span><span class="n">entry</span> <span class="o">-&gt;</span> <span class="o">{</span>
+    <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Content: "</span> <span class="o">+</span> <span class="n">entry</span><span class="o">.</span><span class="na">getContent</span><span class="o">());</span>
+    <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Score: "</span> <span class="o">+</span> <span class="n">entry</span><span class="o">.</span><span class="na">getScore</span><span class="o">());</span>
+<span class="o">});</span>
+</code></pre></div></div>
+
+<hr />
+
+<h3 id="store-entries">Store Entries</h3>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Create entries</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">VectorEntry</span><span class="o">&gt;</span> <span class="n">entries</span> <span class="o">=</span> <span class="nc">List</span><span class="o">.</span><span class="na">of</span><span class="o">(</span>
+    <span class="nc">VectorEntry</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>
+        <span class="o">.</span><span class="na">id</span><span class="o">(</span><span class="s">"doc-1"</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">content</span><span class="o">(</span><span class="s">"Machine learning is a subset of AI"</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">metadata</span><span class="o">(</span><span class="nc">Map</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="s">"source"</span><span class="o">,</span> <span class="s">"wiki"</span><span class="o">,</span> <span class="s">"topic"</span><span class="o">,</span> <span class="s">"AI"</span><span class="o">))</span>
+        <span class="o">.</span><span class="na">build</span><span class="o">(),</span>
+    <span class="nc">VectorEntry</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>
+        <span class="o">.</span><span class="na">id</span><span class="o">(</span><span class="s">"doc-2"</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">content</span><span class="o">(</span><span class="s">"Neural networks use layers of neurons"</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">metadata</span><span class="o">(</span><span class="nc">Map</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="s">"source"</span><span class="o">,</span> <span class="s">"wiki"</span><span class="o">,</span> <span class="s">"topic"</span><span class="o">,</span> <span class="s">"ML"</span><span class="o">))</span>
+        <span class="o">.</span><span class="na">build</span><span class="o">()</span>
+<span class="o">);</span>
+
+<span class="c1">// Store</span>
+<span class="n">vectorStore</span><span class="o">.</span><span class="na">store</span><span class="o">(</span><span class="n">entries</span><span class="o">);</span>
+</code></pre></div></div>
+
+<hr />
+
+<h3 id="search-with-filters">Search with Filters</h3>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">VectorQuery</span> <span class="n">query</span> <span class="o">=</span> <span class="nc">VectorQuery</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>
+    <span class="o">.</span><span class="na">query</span><span class="o">(</span><span class="s">"neural networks"</span><span class="o">)</span>
+    <span class="o">.</span><span class="na">topK</span><span class="o">(</span><span class="mi">5</span><span class="o">)</span>
+    <span class="o">.</span><span class="na">build</span><span class="o">();</span>
+
+<span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">Object</span><span class="o">&gt;</span> <span class="n">filters</span> <span class="o">=</span> <span class="nc">Map</span><span class="o">.</span><span class="na">of</span><span class="o">(</span>
+    <span class="s">"topic"</span><span class="o">,</span> <span class="s">"ML"</span><span class="o">,</span>
+    <span class="s">"source"</span><span class="o">,</span> <span class="s">"wiki"</span>
+<span class="o">);</span>
+
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">VectorEntry</span><span class="o">&gt;</span> <span class="n">results</span> <span class="o">=</span> <span class="n">vectorStore</span><span class="o">.</span><span class="na">search</span><span class="o">(</span><span class="n">query</span><span class="o">,</span> <span class="n">filters</span><span class="o">);</span>
+</code></pre></div></div>
+
+<hr />
+
+<h3 id="delete-entries">Delete Entries</h3>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Delete by IDs</span>
+<span class="n">vectorStore</span><span class="o">.</span><span class="na">delete</span><span class="o">(</span><span class="nc">List</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="s">"doc-1"</span><span class="o">,</span> <span class="s">"doc-2"</span><span class="o">));</span>
+
+<span class="c1">// Delete by filters</span>
+<span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">Object</span><span class="o">&gt;</span> <span class="n">filters</span> <span class="o">=</span> <span class="nc">Map</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="s">"topic"</span><span class="o">,</span> <span class="s">"obsolete"</span><span class="o">);</span>
+<span class="n">vectorStore</span><span class="o">.</span><span class="na">deleteByFilters</span><span class="o">(</span><span class="n">filters</span><span class="o">);</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="configuration-reference">Configuration Reference</h2>
+
+<h3 id="general-settings">General Settings</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">wayang.vector.store.type</code></td>
+      <td><code class="language-plaintext highlighter-rouge">inmemory</code></td>
+      <td>Vector store backend</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">wayang.vector.similarity-threshold</code></td>
+      <td><code class="language-plaintext highlighter-rouge">0.7</code></td>
+      <td>Minimum similarity score</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">wayang.vector.top-k</code></td>
+      <td><code class="language-plaintext highlighter-rouge">5</code></td>
+      <td>Default number of results</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="pgvector-settings">PGVector Settings</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">wayang.vector.store.pgvector.url</code></td>
+      <td>-</td>
+      <td>PostgreSQL JDBC URL</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">wayang.vector.store.pgvector.username</code></td>
+      <td>-</td>
+      <td>Database username</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">wayang.vector.store.pgvector.password</code></td>
+      <td>-</td>
+      <td>Database password</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">wayang.vector.store.pgvector.table</code></td>
+      <td><code class="language-plaintext highlighter-rouge">vectors</code></td>
+      <td>Vector table name</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="faiss-settings">FAISS Settings</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">wayang.vector.store.faiss.index-type</code></td>
+      <td><code class="language-plaintext highlighter-rouge">HNSW</code></td>
+      <td>Index type (HNSW, IVF, etc.)</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">wayang.vector.store.faiss.dimension</code></td>
+      <td><code class="language-plaintext highlighter-rouge">768</code></td>
+      <td>Embedding dimension</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">wayang.vector.store.faiss.metric</code></td>
+      <td><code class="language-plaintext highlighter-rouge">cosine</code></td>
+      <td>Distance metric</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2 id="performance-optimization">Performance Optimization</h2>
+
+<h3 id="indexing-strategies">Indexing Strategies</h3>
+
+<p><strong>For Small Datasets (&lt;10K):</strong></p>
+<ul>
+  <li>Use In-Memory store</li>
+  <li>No index needed</li>
+</ul>
+
+<p><strong>For Medium Datasets (10K-1M):</strong></p>
+<ul>
+  <li>Use PGVector with HNSW index</li>
+  <li>Set <code class="language-plaintext highlighter-rouge">ef_search = 64</code></li>
+</ul>
+
+<p><strong>For Large Datasets (&gt;1M):</strong></p>
+<ul>
+  <li>Use FAISS with IVF index</li>
+  <li>Set nprobe = 10-20</li>
+</ul>
+
+<h3 id="batch-operations">Batch Operations</h3>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Batch store (recommended)</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">VectorEntry</span><span class="o">&gt;</span> <span class="n">entries</span> <span class="o">=</span> <span class="n">getEntries</span><span class="o">();</span> <span class="c1">// 100-1000 entries</span>
+<span class="n">vectorStore</span><span class="o">.</span><span class="na">store</span><span class="o">(</span><span class="n">entries</span><span class="o">);</span>
+
+<span class="c1">// Batch delete</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">ids</span> <span class="o">=</span> <span class="n">getIdsToDelete</span><span class="o">();</span>
+<span class="n">vectorStore</span><span class="o">.</span><span class="na">delete</span><span class="o">(</span><span class="n">ids</span><span class="o">);</span>
+</code></pre></div></div>
+
+<h3 id="caching">Caching</h3>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Inject</span>
+<span class="nc">ResponseCacheService</span> <span class="n">cache</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">VectorEntry</span><span class="o">&gt;</span> <span class="nf">searchWithCache</span><span class="o">(</span><span class="nc">String</span> <span class="n">query</span><span class="o">)</span> <span class="o">{</span>
+    <span class="c1">// Check cache</span>
+    <span class="nc">Optional</span><span class="o">&lt;</span><span class="nc">List</span><span class="o">&lt;</span><span class="nc">VectorEntry</span><span class="o">&gt;&gt;</span> <span class="n">cached</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">query</span><span class="o">);</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">cached</span><span class="o">.</span><span class="na">isPresent</span><span class="o">())</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">cached</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
+    <span class="o">}</span>
+    
+    <span class="c1">// Search and cache</span>
+    <span class="nc">VectorQuery</span> <span class="n">vectorQuery</span> <span class="o">=</span> <span class="nc">VectorQuery</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>
+        <span class="o">.</span><span class="na">query</span><span class="o">(</span><span class="n">query</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">topK</span><span class="o">(</span><span class="mi">5</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">build</span><span class="o">();</span>
+    
+    <span class="nc">List</span><span class="o">&lt;</span><span class="nc">VectorEntry</span><span class="o">&gt;</span> <span class="n">results</span> <span class="o">=</span> <span class="n">vectorStore</span><span class="o">.</span><span class="na">search</span><span class="o">(</span><span class="n">vectorQuery</span><span class="o">);</span>
+    <span class="n">cache</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">query</span><span class="o">,</span> <span class="n">results</span><span class="o">);</span>
+    
+    <span class="k">return</span> <span class="n">results</span><span class="o">;</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="integration-with-memory">Integration with Memory</h2>
+
+<p>See <a href="vector-memory-integration">Vector-Memory Integration</a> for storing memories as vectors.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Inject</span>
+<span class="nc">VectorMemoryAdapter</span> <span class="n">vectorMemory</span><span class="o">;</span>
+
+<span class="c1">// Store memories with embeddings</span>
+<span class="n">vectorMemory</span><span class="o">.</span><span class="na">storeMemories</span><span class="o">(</span><span class="n">memories</span><span class="o">);</span>
+
+<span class="c1">// Search memories by similarity</span>
+<span class="nc">List</span><span class="o">&lt;</span><span class="nc">Memory</span><span class="o">&gt;</span> <span class="n">results</span> <span class="o">=</span> <span class="n">vectorMemory</span><span class="o">.</span><span class="na">searchSimilarMemories</span><span class="o">(</span><span class="n">query</span><span class="o">,</span> <span class="mi">5</span><span class="o">);</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="integration-with-rag">Integration with RAG</h2>
+
+<p>See <a href="rag">RAG Integration</a> for using vector store in RAG pipelines.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Inject</span>
+<span class="nc">RetrievalExecutor</span> <span class="n">ragRetriever</span><span class="o">;</span>
+
+<span class="c1">// Vector-based retrieval</span>
+<span class="nc">RagQuery</span> <span class="n">query</span> <span class="o">=</span> <span class="nc">RagQuery</span><span class="o">.</span><span class="na">builder</span><span class="o">()</span>
+    <span class="o">.</span><span class="na">query</span><span class="o">(</span><span class="s">"How do transformers work?"</span><span class="o">)</span>
+    <span class="o">.</span><span class="na">topK</span><span class="o">(</span><span class="mi">5</span><span class="o">)</span>
+    <span class="o">.</span><span class="na">strategy</span><span class="o">(</span><span class="nc">SearchStrategy</span><span class="o">.</span><span class="na">DENSE</span><span class="o">)</span>
+    <span class="o">.</span><span class="na">build</span><span class="o">();</span>
+
+<span class="nc">RagResult</span> <span class="n">result</span> <span class="o">=</span> <span class="n">ragRetriever</span><span class="o">.</span><span class="na">retrieve</span><span class="o">(</span><span class="n">query</span><span class="o">);</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+
+<h3 id="low-similarity-scores">Low Similarity Scores</h3>
+
+<p><strong>Problem</strong>: All results have scores &lt; 0.5</p>
+
+<p><strong>Solutions</strong>:</p>
+<ol>
+  <li>Lower threshold: <code class="language-plaintext highlighter-rouge">wayang.vector.similarity-threshold=0.5</code></li>
+  <li>Check embedding model consistency</li>
+  <li>Verify query is well-formed</li>
+</ol>
+
+<h3 id="slow-search-performance">Slow Search Performance</h3>
+
+<p><strong>Problem</strong>: Search takes &gt;100ms</p>
+
+<p><strong>Solutions</strong>:</p>
+<ol>
+  <li>Use appropriate index (HNSW for large datasets)</li>
+  <li>Reduce topK parameter</li>
+  <li>Add metadata filters to reduce search space</li>
+  <li>Consider FAISS for &gt;100K entries</li>
+</ol>
+
+<h3 id="out-of-memory">Out of Memory</h3>
+
+<p><strong>Problem</strong>: In-memory store consumes too much RAM</p>
+
+<p><strong>Solutions</strong>:</p>
+<ol>
+  <li>Switch to PGVector or FAISS</li>
+  <li>Implement pagination</li>
+  <li>Use disk-based storage</li>
+</ol>
+
+<hr />
+
+<h2 id="resources">Resources</h2>
+
+<ul>
+  <li><a href="executor-integrations">Executor Integrations Overview</a></li>
+  <li><a href="vector-memory-integration">Vector-Memory Integration</a></li>
+  <li><a href="rag">RAG Documentation</a></li>
+  <li><a href="https://faiss.ai/">FAISS Documentation</a></li>
+  <li><a href="https://github.com/pgvector/pgvector">PGVector Documentation</a></li>
+</ul>
+
+<hr />
+
+<p><a href="executors/">Back to Executors</a>   <a href="graph">Graph Executor</a></p>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>Wayang AI Docs</span>
+      <a href="https://github.com/wayang-ai/wayang-platform">wayang-ai/wayang-platform</a>
+    </div>
+    <div class="container footer-links">
+      <a href="/cookies-policy.html">Cookies Policy</a>
+      <a href="/privacy-policy.html">Privacy Policy</a>
+      <a href="/terms-of-service.html">Terms of Service</a>
+    </div>
+  </footer>
+
+  <!-- Cookie Consent Banner -->
+<div id="cookie-consent-banner" class="cookie-consent-banner" style="display: none;">
+  <div class="cookie-consent-content">
+    <div class="cookie-consent-text">
+      <h3>🍪 We Use Cookies</h3>
+      <p>
+        We use cookies to enhance your browsing experience, analyze site traffic, and personalize content. 
+        By continuing to use this site, you consent to our use of cookies.
+      </p>
+      <p class="cookie-consent-link">
+        <a href="/cookies-policy.html">Learn more</a> about our cookies policy.
+      </p>
+    </div>
+    <div class="cookie-consent-buttons">
+      <button id="cookie-reject" class="btn-cookie-reject">Reject Non-Essential</button>
+      <button id="cookie-customize" class="btn-cookie-customize">Customize</button>
+      <button id="cookie-accept" class="btn-cookie-accept">Accept All</button>
+    </div>
+  </div>
+</div>
+
+<!-- Cookie Preferences Modal -->
+<div id="cookie-preferences-modal" class="cookie-modal" style="display: none;">
+  <div class="cookie-modal-content">
+    <div class="cookie-modal-header">
+      <h2>Cookie Preferences</h2>
+      <button id="cookie-modal-close" class="cookie-modal-close">&times;</button>
+    </div>
+    <div class="cookie-modal-body">
+      <p class="cookie-modal-description">
+        Manage your cookie preferences below. Note that essential cookies cannot be disabled 
+        as they are necessary for the site to function properly.
+      </p>
+      
+      <div class="cookie-category">
+        <div class="cookie-category-header">
+          <div class="cookie-category-info">
+            <h4>Essential Cookies</h4>
+            <p>Required for basic site functionality and security</p>
+          </div>
+          <div class="cookie-category-toggle">
+            <input type="checkbox" id="cookie-essential" checked disabled>
+            <label for="cookie-essential" class="cookie-toggle-label">Always Active</label>
+          </div>
+        </div>
+      </div>
+      
+      <div class="cookie-category">
+        <div class="cookie-category-header">
+          <div class="cookie-category-info">
+            <h4>Performance & Analytics Cookies</h4>
+            <p>Help us understand how visitors use our site</p>
+          </div>
+          <div class="cookie-category-toggle">
+            <input type="checkbox" id="cookie-analytics">
+            <label for="cookie-analytics" class="cookie-toggle-label"></label>
+          </div>
+        </div>
+      </div>
+      
+      <div class="cookie-category">
+        <div class="cookie-category-header">
+          <div class="cookie-category-info">
+            <h4>Functionality Cookies</h4>
+            <p>Remember your preferences and settings</p>
+          </div>
+          <div class="cookie-category-toggle">
+            <input type="checkbox" id="cookie-functionality">
+            <label for="cookie-functionality" class="cookie-toggle-label"></label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cookie-modal-footer">
+      <button id="cookie-save-preferences" class="btn-cookie-save">Save Preferences</button>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Cookie Consent Banner Styles */
+.cookie-consent-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #ffffff;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+  border-top: 3px solid #0f3460;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.cookie-consent-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.cookie-consent-text {
+  flex: 1;
+  min-width: 300px;
+}
+
+.cookie-consent-text h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+  color: #e94560;
+  font-weight: 600;
+}
+
+.cookie-consent-text p {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #e0e0e0;
+}
+
+.cookie-consent-link a {
+  color: #0f3460;
+  background: #e94560;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.cookie-consent-link a:hover {
+  background: #ff6b6b;
+}
+
+.cookie-consent-buttons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.cookie-consent-buttons button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-cookie-accept {
+  background: #e94560;
+  color: white;
+}
+
+.btn-cookie-accept:hover {
+  background: #ff6b6b;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(233, 69, 96, 0.4);
+}
+
+.btn-cookie-reject {
+  background: transparent;
+  color: #e0e0e0;
+  border: 2px solid #e0e0e0;
+}
+
+.btn-cookie-reject:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.btn-cookie-customize {
+  background: #0f3460;
+  color: white;
+}
+
+.btn-cookie-customize:hover {
+  background: #1a4a7a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(15, 52, 96, 0.4);
+}
+
+/* Cookie Modal Styles */
+.cookie-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.cookie-modal-content {
+  background: white;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.cookie-modal-header {
+  padding: 1.5rem 2rem;
+  border-bottom: 2px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: white;
+  border-radius: 12px 12px 0 0;
+}
+
+.cookie-modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #e94560;
+}
+
+.cookie-modal-close {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #e0e0e0;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.cookie-modal-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.cookie-modal-body {
+  padding: 2rem;
+}
+
+.cookie-modal-description {
+  margin-bottom: 1.5rem;
+  color: #555;
+  line-height: 1.6;
+}
+
+.cookie-category {
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+
+.cookie-category:hover {
+  border-color: #0f3460;
+}
+
+.cookie-category-header {
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  background: #f8f9fa;
+}
+
+.cookie-category-info h4 {
+  margin: 0 0 0.25rem 0;
+  color: #1a1a2e;
+  font-size: 1rem;
+}
+
+.cookie-category-info p {
+  margin: 0;
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.cookie-category-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cookie-category-toggle input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #e94560;
+}
+
+.cookie-category-toggle input:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.cookie-toggle-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #e94560;
+  cursor: pointer;
+}
+
+.cookie-modal-footer {
+  padding: 1.5rem 2rem;
+  border-top: 2px solid #e0e0e0;
+  background: #f8f9fa;
+  border-radius: 0 0 12px 12px;
+  text-align: right;
+}
+
+.btn-cookie-save {
+  padding: 0.75rem 2rem;
+  background: #e94560;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cookie-save:hover {
+  background: #ff6b6b;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(233, 69, 96, 0.4);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .cookie-consent-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .cookie-consent-buttons {
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .cookie-consent-buttons button {
+    flex: 1;
+    min-width: 120px;
+  }
+  
+  .cookie-modal-content {
+    width: 95%;
+    max-height: 90vh;
+  }
+  
+  .cookie-category-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+</style>
+
+<script>
+// Cookie Consent Management
+(function() {
+  const COOKIE_CONSENT_KEY = 'wayang_cookie_consent';
+  const COOKIE_VERSION = '1.0';
+  
+  // DOM Elements
+  const banner = document.getElementById('cookie-consent-banner');
+  const modal = document.getElementById('cookie-preferences-modal');
+  const acceptBtn = document.getElementById('cookie-accept');
+  const rejectBtn = document.getElementById('cookie-reject');
+  const customizeBtn = document.getElementById('cookie-customize');
+  const modalClose = document.getElementById('cookie-modal-close');
+  const savePrefsBtn = document.getElementById('cookie-save-preferences');
+  const analyticsCheckbox = document.getElementById('cookie-analytics');
+  const functionalityCheckbox = document.getElementById('cookie-functionality');
+  
+  // Check if consent already given
+  function getConsent() {
+    const consent = localStorage.getItem(COOKIE_CONSENT_KEY);
+    return consent ? JSON.parse(consent) : null;
+  }
+  
+  // Save consent preferences
+  function saveConsent(preferences) {
+    const consent = {
+      version: COOKIE_VERSION,
+      timestamp: new Date().toISOString(),
+      preferences: preferences
+    };
+    localStorage.setItem(COOKIE_CONSENT_KEY, JSON.stringify(consent));
+    
+    // Apply cookie settings
+    applyCookieSettings(preferences);
+  }
+  
+  // Apply cookie settings
+  function applyCookieSettings(preferences) {
+    // Analytics cookies
+    if (!preferences.analytics) {
+      // Disable Google Analytics if rejected
+      if (window.ga) {
+        window.ga('set', 'anonymizeIp', true);
+        window.gaOptout = true;
+      }
+    }
+    
+    // Functionality cookies
+    if (!preferences.functionality) {
+      // Clear functionality cookies
+      document.cookie.split(";").forEach(function(c) {
+        if (c.trim().startsWith('_preferred_') || c.trim().startsWith('_theme_')) {
+          document.cookie = c.split("=")[0] + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+        }
+      });
+    }
+  }
+  
+  // Show banner if no consent
+  function showBanner() {
+    const consent = getConsent();
+    if (!consent) {
+      setTimeout(function() {
+        banner.style.display = 'block';
+      }, 1000);
+    }
+  }
+  
+  // Show modal
+  function showModal() {
+    const consent = getConsent();
+    if (consent) {
+      analyticsCheckbox.checked = consent.preferences.analytics || false;
+      functionalityCheckbox.checked = consent.preferences.functionality || false;
+    }
+    modal.style.display = 'flex';
+  }
+  
+  // Hide modal
+  function hideModal() {
+    modal.style.display = 'none';
+  }
+  
+  // Accept all cookies
+  acceptBtn.addEventListener('click', function() {
+    saveConsent({
+      essential: true,
+      analytics: true,
+      functionality: true
+    });
+    banner.style.display = 'none';
+  });
+  
+ // Reject non-essential cookies
+  rejectBtn.addEventListener('click', function() {
+    saveConsent({
+      essential: true,
+      analytics: false,
+      functionality: false
+    });
+    banner.style.display = 'none';
+  });
+  
+  // Customize cookies
+  customizeBtn.addEventListener('click', function() {
+    showModal();
+  });
+  
+  // Close modal
+  modalClose.addEventListener('click', hideModal);
+  
+  // Save preferences
+  savePrefsBtn.addEventListener('click', function() {
+    saveConsent({
+      essential: true,
+      analytics: analyticsCheckbox.checked,
+      functionality: functionalityCheckbox.checked
+    });
+    hideModal();
+    banner.style.display = 'none';
+  });
+  
+  // Close modal on outside click
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) {
+      hideModal();
+    }
+  });
+  
+  // Keyboard navigation
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && modal.style.display === 'flex') {
+      hideModal();
+    }
+  });
+  
+  // Initialize
+  showBanner();
+  
+  // Expose function to reopen preferences
+  window.openCookiePreferences = showModal;
+})();
+</script>
+
+</body>
+</html>

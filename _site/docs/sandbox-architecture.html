@@ -1,0 +1,954 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sandbox Architecture | Wayang AI</title>
+  <meta name="description" content="Wayang AI documentation and platform guides for building agentic workflows.">
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('wayang-theme');
+        var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        var theme = stored || (prefersLight ? 'light' : 'dark');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <div class="site-bg" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="brand">Wayang AI</a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="/docs/">Docs</a>
+        <a href="/javadoc/">Javadoc</a>
+        <a href="/features/">Features</a>
+        <a href="/about/">About</a>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle theme">Theme</button>
+        <a href="https://github.com/wayang-ai/wayang-platform">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container content-shell">
+    <h1 id="sandbox-runtime-architecture">Sandbox Runtime Architecture</h1>
+
+<p>Visual guide to the Wayang Sandbox Runtime architecture and components.</p>
+
+<hr />
+
+<h2 id="high-level-architecture">High-Level Architecture</h2>
+
+<pre><code class="language-mermaid">graph TB
+    subgraph "Wayang Platform"
+        A[Workflow Engine] --&gt; B[Sandbox Manager]
+        C[Plugin System] --&gt; B
+        D[Memory Services] --&gt; B
+    end
+    
+    subgraph "Sandbox Manager"
+        B --&gt; E[Provider Registry]
+        B --&gt; F[Lifecycle Management]
+        B --&gt; G[Resource Monitor]
+        B --&gt; H[Security Enforcer]
+    end
+    
+    subgraph "Isolation Providers"
+        E --&gt; I[ClassLoader Provider]
+        E --&gt; J[Container Provider]
+        E --&gt; K[WASM Provider]
+    end
+    
+    subgraph "Sandbox Instances"
+        I --&gt; L[Sandbox 1&lt;br/&gt;ClassLoader]
+        I --&gt; M[Sandbox 2&lt;br/&gt;ClassLoader]
+        J --&gt; N[Sandbox 3&lt;br/&gt;Docker]
+        K --&gt; O[Sandbox 4&lt;br/&gt;WASM]
+    end
+    
+    subgraph "Isolation Layers"
+        L --&gt; P[Isolated ClassLoader&lt;br/&gt;SecurityManager]
+        N --&gt; Q[Docker Container&lt;br/&gt;cgroups + namespaces]
+        O --&gt; R[WasmEdge Runtime&lt;br/&gt;Sandboxed WASM]
+    end
+    
+    subgraph "Host System"
+        P --&gt; S[JVM]
+        Q --&gt; T[Docker Daemon]
+        R --&gt; U[WasmEdge]
+        S --&gt; V[Operating System]
+        T --&gt; V
+        U --&gt; V
+    end
+</code></pre>
+
+<hr />
+
+<h2 id="sandbox-lifecycle">Sandbox Lifecycle</h2>
+
+<pre><code class="language-mermaid">sequenceDiagram
+    participant Client
+    participant SM as Sandbox Manager
+    participant P as Provider
+    participant SI as Sandbox Instance
+    
+    Client-&gt;&gt;SM: createSandbox(config)
+    SM-&gt;&gt;P: createSandbox(config)
+    P-&gt;&gt;SI: instantiate()
+    SI--&gt;&gt;P: instance
+    P--&gt;&gt;SM: instance
+    SM--&gt;&gt;Client: SandboxInstance
+    
+    Note over SI: State: INITIALIZING
+    SI-&gt;&gt;SI: initialize()
+    Note over SI: State: READY
+    
+    Client-&gt;&gt;SI: execute(context)
+    Note over SI: State: RUNNING
+    SI-&gt;&gt;SI: executeWorkflow()
+    SI--&gt;&gt;Client: ExecutionResult
+    Note over SI: State: READY
+    
+    Client-&gt;&gt;SI: pause()
+    Note over SI: State: PAUSED
+    
+    Client-&gt;&gt;SI: resume()
+    Note over SI: State: READY
+    
+    Client-&gt;&gt;SI: terminate()
+    Note over SI: State: TERMINATING
+    SI-&gt;&gt;SI: cleanup()
+    Note over SI: State: TERMINATED
+</code></pre>
+
+<hr />
+
+<h2 id="security-architecture">Security Architecture</h2>
+
+<pre><code class="language-mermaid">graph TB
+    subgraph "Security Layers"
+        A[Client Request] --&gt; B[API Gateway]
+        B --&gt; C[Authentication]
+        C --&gt; D[Authorization]
+        D --&gt; E[Sandbox Manager]
+    end
+    
+    subgraph "Sandbox Security"
+        E --&gt; F[Security Policy]
+        F --&gt; G[Resource Quotas]
+        F --&gt; H[Access Control]
+    end
+    
+    subgraph "ClassLoader Isolation"
+        G --&gt; I[Isolated ClassLoader]
+        H --&gt; J[SecurityManager]
+        I --&gt; K[Blocked Classes]
+        J --&gt; L[Permission Checks]
+    end
+    
+    subgraph "Container Isolation"
+        G --&gt; M[cgroups limits]
+        H --&gt; N[namespace isolation]
+        M --&gt; O[Read-only FS]
+        N --&gt; P[Network Policies]
+    end
+    
+    subgraph "Host Protection"
+        K --&gt; Q[JVM Security]
+        L --&gt; Q
+        O --&gt; R[OS Security]
+        P --&gt; R
+    end
+</code></pre>
+
+<hr />
+
+<h2 id="multi-tenant-architecture">Multi-Tenant Architecture</h2>
+
+<pre><code class="language-mermaid">graph TB
+    subgraph "Tenant A"
+        A1[Workflow A] --&gt; A2[Sandbox A1]
+        A1 --&gt; A3[Sandbox A2]
+        A2 --&gt; A4[Memory A]
+        A3 --&gt; A4
+        A4 --&gt; A5[Vector Store A]
+    end
+    
+    subgraph "Tenant B"
+        B1[Workflow B] --&gt; B2[Sandbox B1]
+        B1 --&gt; B3[Sandbox B2]
+        B2 --&gt; B4[Memory B]
+        B3 --&gt; B4
+        B4 --&gt; B5[Vector Store B]
+    end
+    
+    subgraph "Tenant C"
+        C1[Workflow C] --&gt; C2[Sandbox C1]
+        C2 --&gt; C3[Memory C]
+        C3 --&gt; C4[Vector Store C]
+    end
+    
+    A2 --&gt; D[Sandbox Manager]
+    A3 --&gt; D
+    B2 --&gt; D
+    B3 --&gt; D
+    C2 --&gt; D
+    
+    D --&gt; E[Resource Quota Enforcer]
+    D --&gt; F[Tenant Isolation Boundary]
+    D --&gt; G[Audit Logger]
+</code></pre>
+
+<hr />
+
+<h2 id="resource-management-flow">Resource Management Flow</h2>
+
+<pre><code class="language-mermaid">sequenceDiagram
+    participant Client
+    participant SM as Sandbox Manager
+    participant Q as Quota Enforcer
+    participant M as Metrics Collector
+    participant SI as Sandbox Instance
+    
+    Client-&gt;&gt;SM: createSandbox(quotas)
+    SM-&gt;&gt;Q: validateQuotas(quotas)
+    Q--&gt;&gt;SM: quotas valid
+    SM-&gt;&gt;SI: create(quotas)
+    
+    loop Every 5 seconds
+        SI-&gt;&gt;M: reportMetrics()
+        M-&gt;&gt;Q: checkQuotas(metrics)
+        alt Quota Exceeded
+            Q-&gt;&gt;SI: throttle()
+            Q-&gt;&gt;SM: alertQuotaExceeded()
+        else Within Quota
+            M-&gt;&gt;SM: updateMetrics()
+        end
+    end
+    
+    SM-&gt;&gt;M: collectMetrics()
+    SM--&gt;&gt;Client: exposeMetrics()
+</code></pre>
+
+<hr />
+
+<h2 id="provider-selection-strategy">Provider Selection Strategy</h2>
+
+<pre><code class="language-mermaid">graph LR
+    A[Workflow Request] --&gt; B{Security Required?}
+    B --&gt;|High| C{Untrusted Code?}
+    B --&gt;|Standard| D{Performance Critical?}
+    B --&gt;|Minimal| E[ClassLoader]
+    
+    C --&gt;|Yes| F[Container]
+    C --&gt;|No| G{Portable Needed?}
+    
+    D --&gt;|Yes| E
+    D --&gt;|No| H{Docker Available?}
+    
+    G --&gt;|Yes| I[WASM]
+    G --&gt;|No| E
+    
+    H --&gt;|Yes| F
+    H --&gt;|No| E
+    
+    E --&gt; J[Execute]
+    F --&gt; J
+    I --&gt; J
+</code></pre>
+
+<hr />
+
+<h2 id="api-request-flow">API Request Flow</h2>
+
+<pre><code class="language-mermaid">sequenceDiagram
+    participant Client
+    participant API as SandboxResource
+    participant SM as SandboxManager
+    participant P as Provider
+    participant SI as SandboxInstance
+    
+    Client-&gt;&gt;API: POST /api/sandbox/instances
+    API-&gt;&gt;SM: createSandbox(config)
+    SM-&gt;&gt;P: createSandbox(config)
+    P-&gt;&gt;SI: instantiate()
+    SI--&gt;&gt;P: instance
+    P--&gt;&gt;SM: instance
+    SM--&gt;&gt;API: instance
+    API--&gt;&gt;Client: 201 Created + Instance
+    
+    Client-&gt;&gt;API: GET /api/sandbox/instances/{id}
+    API-&gt;&gt;SM: getSandbox(id)
+    SM--&gt;&gt;API: instance
+    API--&gt;&gt;Client: 200 OK + Instance
+    
+    Client-&gt;&gt;API: POST /api/sandbox/instances/{id}/execute
+    API-&gt;&gt;SM: getSandbox(id)
+    SM--&gt;&gt;API: instance
+    API-&gt;&gt;SI: execute(context)
+    SI--&gt;&gt;API: result
+    API--&gt;&gt;Client: 200 OK + Result
+    
+    Client-&gt;&gt;API: DELETE /api/sandbox/instances/{id}
+    API-&gt;&gt;SM: terminateSandbox(id)
+    SM-&gt;&gt;SI: terminate()
+    SI--&gt;&gt;SM: terminated
+    SM--&gt;&gt;API: success
+    API--&gt;&gt;Client: 204 No Content
+</code></pre>
+
+<hr />
+
+<h2 id="observability-stack">Observability Stack</h2>
+
+<pre><code class="language-mermaid">graph TB
+    subgraph "Sandbox Runtime"
+        A[Sandbox Instances] --&gt; B[Metrics Collector]
+        A --&gt; C[Log Aggregator]
+        A --&gt; D[Trace Generator]
+    end
+    
+    subgraph "Metrics Pipeline"
+        B --&gt; E[Micrometer]
+        E --&gt; F[Prometheus]
+        F --&gt; G[Grafana]
+    end
+    
+    subgraph "Logging Pipeline"
+        C --&gt; H[Structured Logs]
+        H --&gt; I[Log Collector]
+        I --&gt; J[Elasticsearch]
+        J --&gt; K[Kibana]
+    end
+    
+    subgraph "Tracing Pipeline"
+        D --&gt; L[OpenTelemetry]
+        L --&gt; M[Jaeger/Zipkin]
+        M --&gt; N[Distributed Traces]
+    end
+    
+    subgraph "Alerting"
+        F --&gt; O[Alert Manager]
+        J --&gt; O
+        O --&gt; P[Notifications]
+    end
+</code></pre>
+
+<hr />
+
+<h2 id="deployment-patterns">Deployment Patterns</h2>
+
+<h3 id="single-node-deployment">Single Node Deployment</h3>
+
+<pre><code class="language-mermaid">graph TB
+    A[Wayang Standalone] --&gt; B[Sandbox Runtime]
+    B --&gt; C[ClassLoader Provider]
+    B --&gt; D[Container Provider]
+    C --&gt; E[Sandbox Instances]
+    D --&gt; F[Docker Containers]
+    E --&gt; G[JVM]
+    F --&gt; H[Docker Daemon]
+    G --&gt; I[Host OS]
+    H --&gt; I
+</code></pre>
+
+<h3 id="multi-node-cluster-deployment">Multi-Node Cluster Deployment</h3>
+
+<pre><code class="language-mermaid">graph TB
+    A[Load Balancer] --&gt; B[Node 1]
+    A --&gt; C[Node 2]
+    A --&gt; D[Node 3]
+    
+    B --&gt; E[Sandbox Manager]
+    C --&gt; F[Sandbox Manager]
+    D --&gt; G[Sandbox Manager]
+    
+    E --&gt; H[Container Provider]
+    F --&gt; I[Container Provider]
+    G --&gt; J[Container Provider]
+    
+    H --&gt; K[Docker Cluster]
+    I --&gt; K
+    J --&gt; K
+    
+    K --&gt; L[Node 4]
+    K --&gt; M[Node 5]
+    K --&gt; N[Node 6]
+</code></pre>
+
+<hr />
+
+<p><a href="./sandbox-runtime.md">← Back to Sandbox Runtime</a></p>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>Wayang AI Docs</span>
+      <a href="https://github.com/wayang-ai/wayang-platform">wayang-ai/wayang-platform</a>
+    </div>
+    <div class="container footer-links">
+      <a href="/cookies-policy.html">Cookies Policy</a>
+      <a href="/privacy-policy.html">Privacy Policy</a>
+      <a href="/terms-of-service.html">Terms of Service</a>
+    </div>
+  </footer>
+
+  <!-- Cookie Consent Banner -->
+<div id="cookie-consent-banner" class="cookie-consent-banner" style="display: none;">
+  <div class="cookie-consent-content">
+    <div class="cookie-consent-text">
+      <h3>🍪 We Use Cookies</h3>
+      <p>
+        We use cookies to enhance your browsing experience, analyze site traffic, and personalize content. 
+        By continuing to use this site, you consent to our use of cookies.
+      </p>
+      <p class="cookie-consent-link">
+        <a href="/cookies-policy.html">Learn more</a> about our cookies policy.
+      </p>
+    </div>
+    <div class="cookie-consent-buttons">
+      <button id="cookie-reject" class="btn-cookie-reject">Reject Non-Essential</button>
+      <button id="cookie-customize" class="btn-cookie-customize">Customize</button>
+      <button id="cookie-accept" class="btn-cookie-accept">Accept All</button>
+    </div>
+  </div>
+</div>
+
+<!-- Cookie Preferences Modal -->
+<div id="cookie-preferences-modal" class="cookie-modal" style="display: none;">
+  <div class="cookie-modal-content">
+    <div class="cookie-modal-header">
+      <h2>Cookie Preferences</h2>
+      <button id="cookie-modal-close" class="cookie-modal-close">&times;</button>
+    </div>
+    <div class="cookie-modal-body">
+      <p class="cookie-modal-description">
+        Manage your cookie preferences below. Note that essential cookies cannot be disabled 
+        as they are necessary for the site to function properly.
+      </p>
+      
+      <div class="cookie-category">
+        <div class="cookie-category-header">
+          <div class="cookie-category-info">
+            <h4>Essential Cookies</h4>
+            <p>Required for basic site functionality and security</p>
+          </div>
+          <div class="cookie-category-toggle">
+            <input type="checkbox" id="cookie-essential" checked disabled>
+            <label for="cookie-essential" class="cookie-toggle-label">Always Active</label>
+          </div>
+        </div>
+      </div>
+      
+      <div class="cookie-category">
+        <div class="cookie-category-header">
+          <div class="cookie-category-info">
+            <h4>Performance & Analytics Cookies</h4>
+            <p>Help us understand how visitors use our site</p>
+          </div>
+          <div class="cookie-category-toggle">
+            <input type="checkbox" id="cookie-analytics">
+            <label for="cookie-analytics" class="cookie-toggle-label"></label>
+          </div>
+        </div>
+      </div>
+      
+      <div class="cookie-category">
+        <div class="cookie-category-header">
+          <div class="cookie-category-info">
+            <h4>Functionality Cookies</h4>
+            <p>Remember your preferences and settings</p>
+          </div>
+          <div class="cookie-category-toggle">
+            <input type="checkbox" id="cookie-functionality">
+            <label for="cookie-functionality" class="cookie-toggle-label"></label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cookie-modal-footer">
+      <button id="cookie-save-preferences" class="btn-cookie-save">Save Preferences</button>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Cookie Consent Banner Styles */
+.cookie-consent-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #ffffff;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+  border-top: 3px solid #0f3460;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.cookie-consent-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.cookie-consent-text {
+  flex: 1;
+  min-width: 300px;
+}
+
+.cookie-consent-text h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+  color: #e94560;
+  font-weight: 600;
+}
+
+.cookie-consent-text p {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #e0e0e0;
+}
+
+.cookie-consent-link a {
+  color: #0f3460;
+  background: #e94560;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.cookie-consent-link a:hover {
+  background: #ff6b6b;
+}
+
+.cookie-consent-buttons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.cookie-consent-buttons button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-cookie-accept {
+  background: #e94560;
+  color: white;
+}
+
+.btn-cookie-accept:hover {
+  background: #ff6b6b;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(233, 69, 96, 0.4);
+}
+
+.btn-cookie-reject {
+  background: transparent;
+  color: #e0e0e0;
+  border: 2px solid #e0e0e0;
+}
+
+.btn-cookie-reject:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.btn-cookie-customize {
+  background: #0f3460;
+  color: white;
+}
+
+.btn-cookie-customize:hover {
+  background: #1a4a7a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(15, 52, 96, 0.4);
+}
+
+/* Cookie Modal Styles */
+.cookie-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.cookie-modal-content {
+  background: white;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.cookie-modal-header {
+  padding: 1.5rem 2rem;
+  border-bottom: 2px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: white;
+  border-radius: 12px 12px 0 0;
+}
+
+.cookie-modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #e94560;
+}
+
+.cookie-modal-close {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #e0e0e0;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.cookie-modal-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.cookie-modal-body {
+  padding: 2rem;
+}
+
+.cookie-modal-description {
+  margin-bottom: 1.5rem;
+  color: #555;
+  line-height: 1.6;
+}
+
+.cookie-category {
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+
+.cookie-category:hover {
+  border-color: #0f3460;
+}
+
+.cookie-category-header {
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  background: #f8f9fa;
+}
+
+.cookie-category-info h4 {
+  margin: 0 0 0.25rem 0;
+  color: #1a1a2e;
+  font-size: 1rem;
+}
+
+.cookie-category-info p {
+  margin: 0;
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.cookie-category-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cookie-category-toggle input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #e94560;
+}
+
+.cookie-category-toggle input:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.cookie-toggle-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #e94560;
+  cursor: pointer;
+}
+
+.cookie-modal-footer {
+  padding: 1.5rem 2rem;
+  border-top: 2px solid #e0e0e0;
+  background: #f8f9fa;
+  border-radius: 0 0 12px 12px;
+  text-align: right;
+}
+
+.btn-cookie-save {
+  padding: 0.75rem 2rem;
+  background: #e94560;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cookie-save:hover {
+  background: #ff6b6b;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(233, 69, 96, 0.4);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .cookie-consent-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .cookie-consent-buttons {
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .cookie-consent-buttons button {
+    flex: 1;
+    min-width: 120px;
+  }
+  
+  .cookie-modal-content {
+    width: 95%;
+    max-height: 90vh;
+  }
+  
+  .cookie-category-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+</style>
+
+<script>
+// Cookie Consent Management
+(function() {
+  const COOKIE_CONSENT_KEY = 'wayang_cookie_consent';
+  const COOKIE_VERSION = '1.0';
+  
+  // DOM Elements
+  const banner = document.getElementById('cookie-consent-banner');
+  const modal = document.getElementById('cookie-preferences-modal');
+  const acceptBtn = document.getElementById('cookie-accept');
+  const rejectBtn = document.getElementById('cookie-reject');
+  const customizeBtn = document.getElementById('cookie-customize');
+  const modalClose = document.getElementById('cookie-modal-close');
+  const savePrefsBtn = document.getElementById('cookie-save-preferences');
+  const analyticsCheckbox = document.getElementById('cookie-analytics');
+  const functionalityCheckbox = document.getElementById('cookie-functionality');
+  
+  // Check if consent already given
+  function getConsent() {
+    const consent = localStorage.getItem(COOKIE_CONSENT_KEY);
+    return consent ? JSON.parse(consent) : null;
+  }
+  
+  // Save consent preferences
+  function saveConsent(preferences) {
+    const consent = {
+      version: COOKIE_VERSION,
+      timestamp: new Date().toISOString(),
+      preferences: preferences
+    };
+    localStorage.setItem(COOKIE_CONSENT_KEY, JSON.stringify(consent));
+    
+    // Apply cookie settings
+    applyCookieSettings(preferences);
+  }
+  
+  // Apply cookie settings
+  function applyCookieSettings(preferences) {
+    // Analytics cookies
+    if (!preferences.analytics) {
+      // Disable Google Analytics if rejected
+      if (window.ga) {
+        window.ga('set', 'anonymizeIp', true);
+        window.gaOptout = true;
+      }
+    }
+    
+    // Functionality cookies
+    if (!preferences.functionality) {
+      // Clear functionality cookies
+      document.cookie.split(";").forEach(function(c) {
+        if (c.trim().startsWith('_preferred_') || c.trim().startsWith('_theme_')) {
+          document.cookie = c.split("=")[0] + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+        }
+      });
+    }
+  }
+  
+  // Show banner if no consent
+  function showBanner() {
+    const consent = getConsent();
+    if (!consent) {
+      setTimeout(function() {
+        banner.style.display = 'block';
+      }, 1000);
+    }
+  }
+  
+  // Show modal
+  function showModal() {
+    const consent = getConsent();
+    if (consent) {
+      analyticsCheckbox.checked = consent.preferences.analytics || false;
+      functionalityCheckbox.checked = consent.preferences.functionality || false;
+    }
+    modal.style.display = 'flex';
+  }
+  
+  // Hide modal
+  function hideModal() {
+    modal.style.display = 'none';
+  }
+  
+  // Accept all cookies
+  acceptBtn.addEventListener('click', function() {
+    saveConsent({
+      essential: true,
+      analytics: true,
+      functionality: true
+    });
+    banner.style.display = 'none';
+  });
+  
+ // Reject non-essential cookies
+  rejectBtn.addEventListener('click', function() {
+    saveConsent({
+      essential: true,
+      analytics: false,
+      functionality: false
+    });
+    banner.style.display = 'none';
+  });
+  
+  // Customize cookies
+  customizeBtn.addEventListener('click', function() {
+    showModal();
+  });
+  
+  // Close modal
+  modalClose.addEventListener('click', hideModal);
+  
+  // Save preferences
+  savePrefsBtn.addEventListener('click', function() {
+    saveConsent({
+      essential: true,
+      analytics: analyticsCheckbox.checked,
+      functionality: functionalityCheckbox.checked
+    });
+    hideModal();
+    banner.style.display = 'none';
+  });
+  
+  // Close modal on outside click
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) {
+      hideModal();
+    }
+  });
+  
+  // Keyboard navigation
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && modal.style.display === 'flex') {
+      hideModal();
+    }
+  });
+  
+  // Initialize
+  showBanner();
+  
+  // Expose function to reopen preferences
+  window.openCookiePreferences = showModal;
+})();
+</script>
+
+</body>
+</html>

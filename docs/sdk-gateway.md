@@ -39,7 +39,7 @@ public GollekSdk produceGollekSdk() {
 
 One of the largest benefits of moving inference generation through `gollek-sdk` is high-performance streaming. Through the SDK's `inferStream` method, Wayang's `SkillBasedAgentExecutor` handles generative streams natively.
 
-Rather than waiting for the entire loop to finish sequentially, Wayang's agent API can surface `StreamChunk` emissions up to the end-users instantly, creating responsive front-end experiences out-of-the-box.
+Rather than waiting for the entire loop to finish sequentially, Wayang's agent API can surface `InferenceChunk` emissions up to the end-users instantly, creating responsive front-end experiences out-of-the-box.
 
 ---
 

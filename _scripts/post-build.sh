@@ -6,10 +6,10 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WEBSITE_ROOT="$(dirname "$SCRIPT_DIR")"
 JAVADOC_SRC="$WEBSITE_ROOT/javadoc"
-JAVADOC_DEST="$WEBSITE_ROOT/_site/docs/javadoc"
+JAVADOC_DEST="$WEBSITE_ROOT/_site/javadoc"
 
 if [ -d "$JAVADOC_SRC" ]; then
-    echo "Copying Javadoc to _site/docs/javadoc..."
+    echo "Copying Javadoc to _site/javadoc..."
     rm -rf "$JAVADOC_DEST"
     mkdir -p "$(dirname "$JAVADOC_DEST")"
     cp -r "$JAVADOC_SRC" "$JAVADOC_DEST"

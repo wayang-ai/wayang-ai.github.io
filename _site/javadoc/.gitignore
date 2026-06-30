@@ -1,0 +1,10 @@
+# Javadoc generated files - DO NOT IGNORE
+# These files MUST be committed for GitHub Pages to serve them
+# 
+# Only ignore build artifacts that can be regenerated:
+*.sh
+javadoc.sh
+
+# Keep everything else (HTML, JS, CSS, resources)
+# These are required for the Javadoc to work on GitHub Pages
+
